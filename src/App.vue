@@ -1,8 +1,8 @@
 <template>
   <div class="app-wrapper">
-    <AppSideBar/>
+    <AppSideBar :expanded="expanded" @toggle-sidebar="toggleSidebar" @expand-sidebar="expandSidebar" @collapse-sidebar="collapseSidebar"/>
 
-    <main class="main-content" :class="{expanded: isExpanded}">
+    <main class="main-content" :class="{expanded}">
       <!-- Aquí se carga el contenido dinámico según la ruta -->
       <router-view />
     </main>
@@ -20,13 +20,19 @@ export default {
   },
   data () {
     return {
-      isExpanded: false,
+      expanded: false,
     };
   },
 
   methods: {
     toggleSidebar() {
-      this.isExpanded= !this.isExpanded;
+      this.expanded= !this.expanded;
+    },
+    async expandSidebar() {
+      this.expanded = true;
+    },
+    async collapseSidebar() {
+      this.expanded = false;
     },
   },
 };
@@ -37,6 +43,11 @@ export default {
 .app-wrapper {
   display: flex;
   min-height: 100vh;
+}
+
+.app-wrapper {
+  padding-right: 0;
+  /* Elimina el padding del lado derecho */
 }
 
 .tooltip-text {
@@ -62,5 +73,26 @@ export default {
   margin-left: 255px;
   z-index: 1;
 }
+
+.toggle-btn {
+  background-color: #d4d4d4;
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  text-align: center;
+  margin: 10px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.toggle-btn i {
+  font-size: 1.5rem;
+  color: #c09d62;
+}
+
+
 
 </style>

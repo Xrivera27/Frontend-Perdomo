@@ -1,8 +1,8 @@
 <template>
-    <aside ref="sidebar" class="sidebar" :class="{expanded : isExpanded}">
+    <aside ref="sidebar" class="sidebar" :class="{expanded}">
         <!--Boton de expansion y retracion del AppSidebar-->
-        <li @click="toggleSidebar" class="nav-item toggle-btn">
-            <i class="bi" :class="isExpanded ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
+        <li class="nav-item toggle-btn" @click="toggleSidebar" >
+            <i class="bi" :class="expanded ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
         </li>
 
       <ul class="nav flex-column">
@@ -11,7 +11,7 @@
         <li class="nav-item">
           <router-link to="/home" class="nav-link">
             <i class="bi bi-house-door-fill"></i>
-            <span v-if= "isExpanded" class="link-text">Home</span>
+            <span v-if= "expanded" class="link-text">Home</span>
           </router-link>
         </li>
 
@@ -19,7 +19,7 @@
         <li class="nav-item">
           <router-link to="/sucursales" class="nav-link">
             <i class="bi bi-shop-window"></i>
-            <span v-if= "isExpanded" class="link-text">Sucursales</span>
+            <span v-if= "expanded" class="link-text">Sucursales</span>
           </router-link>
         </li>
 
@@ -27,7 +27,7 @@
         <li class="nav-item">
           <router-link to="/usuarios" class="nav-link">
             <i class="bi bi-person-fill"></i>
-            <span v-if= "isExpanded" class="link-text">Usuarios</span>
+            <span v-if= "expanded" class="link-text">Usuarios</span>
           </router-link>
         </li>
         
@@ -40,7 +40,7 @@
         <li class="nav-item">
           <router-link to="/config-page" class="nav-link">
             <i class="bi bi-gear-fill"></i>
-            <span v-if="isExpanded" class="tooltip-text">Configuracion</span>
+            <span v-if="expanded" class="tooltip-text">Configuracion</span>
           </router-link>
         </li>
 
@@ -48,7 +48,7 @@
         <li class="nav-item">
           <a class="nav-link" style="cursor: pointer;">
             <i class="bi bi-box-arrow-right"></i>
-            <span v-if="isExpanded" class="tooltip-text">Cerrar sesión</span>
+            <span v-if="expanded" class="tooltip-text">Cerrar sesión</span>
           </a>
         </li>
       </ul>
@@ -60,7 +60,7 @@
   export default {
     name: "AppSidebar",
     props: {
-      isExpanded:{
+      expanded:{
         type: Boolean,
         required: true,
       },
@@ -68,6 +68,12 @@
     methods: {
       toggleSidebar() {
         this.$emit('toggle-sidebar');
+      },
+      expandSidebar() {
+            this.$emit('expand-sidebar'); // Emitir evento para expandir
+      },
+        collapseSidebar() {
+            this.$emit('collapse-sidebar'); // Emitir evento para contraer
       },
     },
   };
@@ -94,8 +100,17 @@ a.nav-link {
     /* Alinea el contenido a la izquierda */
 }
 
-ul.nav {
-    padding: 0 15px;
+.main-content.expanded {
+    padding-left: 0px;
+    z-index: 1;
+}
+
+.main-content {
+    margin-left: 80px;
+    padding: 20px;
+    width: 100%;
+    transition: margin-left 0.3s ease, background-color 0.3s ease;
+    background-color: #f5f5f5;
 }
 
 /* Estilos y layout del sidebar*/ 
