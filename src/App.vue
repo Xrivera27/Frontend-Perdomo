@@ -50,15 +50,16 @@ export default {
   /* Elimina el padding del lado derecho */
 }
 
-.tooltip-text {
-  display: none;
-  position: absolute;
-  left: 90px;
-  white-space: nowrap;
-  background-color: #333;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
+#aside-line {
+  width: 60%;
+  height: 1px;
+  background-color: #c09d62;
+  margin: 10px auto;
+}
+
+a.nav-link {
+  display: flex;
+  justify-content: center;
 }
 
 .main-content {
@@ -93,6 +94,38 @@ export default {
   color: #c09d62;
 }
 
+.tooltip-text {
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.nav {
+  list-style: none;
+  padding: 0;
+}
+
+.nav-item {
+  margin-bottom: 0.10vh;
+  position: relative;
+  justify-content: center;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5vh 1.5vh;
+  color: #c09d62;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  border-radius: 8px;
+}
+
+.nav-link i {
+  font-size: 4vh;
+  color: inherit;
+}
 
 
 </style>

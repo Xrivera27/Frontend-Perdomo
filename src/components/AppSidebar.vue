@@ -11,7 +11,7 @@
         <li class="nav-item">
           <router-link to="/home" class="nav-link">
             <i class="bi bi-house-door-fill"></i>
-            <span v-if= "expanded" class="link-text">Home</span>
+            <span v-if= "expanded" class="tooltip-text">Home</span>
           </router-link>
         </li>
 
@@ -19,7 +19,7 @@
         <li class="nav-item">
           <router-link to="/sucursales" class="nav-link">
             <i class="bi bi-shop-window"></i>
-            <span v-if= "expanded" class="link-text">Sucursales</span>
+            <span v-if= "expanded" class="tooltip-text">Sucursales</span>
           </router-link>
         </li>
 
@@ -27,7 +27,7 @@
         <li class="nav-item">
           <router-link to="/usuarios" class="nav-link">
             <i class="bi bi-person-fill"></i>
-            <span v-if= "expanded" class="link-text">Usuarios</span>
+            <span v-if= "expanded" class="tooltip-text">Usuarios</span>
           </router-link>
         </li>
         
@@ -51,6 +51,11 @@
             <span v-if="expanded" class="tooltip-text">Cerrar sesión</span>
           </a>
         </li>
+
+        <!-- Toggle Dark Mode -->
+        <li class="nav-item toggle-btn">
+            <i class="bi bi-moon-stars-fill"></i>                  
+          </li>
       </ul>
 
     </aside>
@@ -86,6 +91,11 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
 #aside-line {
     width: 60%;
     height: 1px;
@@ -100,6 +110,12 @@ a.nav-link {
     /* Alinea el contenido a la izquierda */
 }
 
+/* 
+ul.nav {
+    padding: 0 15px;
+}
+ */
+
 .main-content.expanded {
     padding-left: 0px;
     z-index: 1;
@@ -113,64 +129,37 @@ a.nav-link {
     background-color: #f5f5f5;
 }
 
-/* Estilos y layout del sidebar*/ 
-.sidebar {
-  width: 80px;
-  background-color:#ebebeb;
-  color: white;
-  padding-top: 20px;
-  position: fixed;
-  height: 100%;
-  transition: width 0.3s ease;
-  overflow-x: hidden;
+/*.main-content.dark */
+
+/* Estilo del botón de expansión/retracción del AppSidebar */
+.toggle-btn {
+    background-color: #d4d4d4;
+    border-radius: 50%;
+
+    padding: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin: 10px auto;
+
+    display: flex;
+    justify-content: center;
+
+    align-items: center;
+    width: 40px;
+
+    height: 40px;
+
+    position: relative;
+
+    flex-shrink: 0;
+
 }
 
-.sidebar.expanded {
-    width: 250px; /*Tamaño del sidebar al esta expandido */
-
-    .nav-item{
-        padding-left: 40px
-    }
-
-    .toggle-btn{
-        padding: 0;
-    }
+.tooltip-text {
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 15px;
 }
-
-.sidebar .nav {
-  list-style: none;
-  padding-left: 0;
-}
-
-.sidebar .nav-item {
-  margin-bottom: 10px;
-}
-
-.sidebar .nav-link {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  color: rgb(245, 196, 91);
-  font-size: 24px;
-  text-align: center;
-  position: relative;
-  text-decoration: none;
-}
-
-.sidebar .nav-link:hover {
-  background-color: rgb(238, 203, 157);
-  color: white;
-}
-
-.sidebar .nav-link i {
-  display: block;
-}
-
-.sidebar .nav-link:hover .tooltip-text {
-  display: block;
-}
-
 
 .nav-list {
     list-style: none;
@@ -212,34 +201,76 @@ a.nav-link {
     /* Color del texto y los íconos en estado activo */
 }
 
+/* Estilos y layout del sidebar*/ 
+.sidebar {
+  width: 80px;
+  background-color:#ebebeb;
+  position: fixed;
+  height: 100%;
+  padding-top: 20px;
+  padding-right: 0;
+  z-index: 10;
+  margin: 0;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+.sidebar.expanded {
+    width: 250px; /*Tamaño del sidebar al esta expandido */
+
+    .nav-item{
+        padding-left: 40px
+    }
+
+    .toggle-btn{
+        padding: 0;
+    }
+}
+
+/*.sidebar a.navlink */
+
+/*.sidebar dark a.navlink */
+
+/*.sidebar a.navlink active */
+
+.sidebar .nav {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar .nav-item {
+  margin-bottom: 10px;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  color: rgb(245, 196, 91);
+  font-size: 24px;
+  text-align: center;
+  position: relative;
+  text-decoration: none;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgb(238, 203, 157);
+  color: white;
+}
+
+.sidebar .nav-link i {
+  display: block;
+}
+
+.sidebar .nav-link:hover .tooltip-text {
+  display: block;
+}
+
 .link-text {
     margin-left: 10px;
     transition: opacity 0.3s ease;
 }
   
-/* Estilo del botón de expansión/retracción del AppSidebar */
-.toggle-btn {
-    background-color: #d4d4d4;
-    border-radius: 50%;
-
-    padding: 5px;
-    cursor: pointer;
-    text-align: center;
-    margin: 10px auto;
-
-    display: flex;
-    justify-content: center;
-
-    align-items: center;
-    width: 40px;
-
-    height: 40px;
-
-    position: relative;
-
-    flex-shrink: 0;
-
-}
-
 </style>
   
