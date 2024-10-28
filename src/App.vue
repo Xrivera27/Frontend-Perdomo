@@ -127,5 +127,8 @@ a.nav-link {
   color: inherit;
 }
 
+.nav-link:hover {
+  background-color: #dadada;
+}
 
 </style>

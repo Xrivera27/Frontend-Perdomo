@@ -1,113 +1,116 @@
 <template>
-    <aside ref="sidebar" class="sidebar" :class="{expanded}">
-        <!--Boton de expansion y retracion del AppSidebar-->
-        <li class="nav-item toggle-btn" @click="toggleSidebar" >
-            <i class="bi" :class="expanded ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
-        </li>
+  <aside ref="sidebar" class="sidebar" :class="{ expanded }">
+    <!-- Toggle button for expanding/collapsing -->
+    <!-- Toggle Sidebar Arrow -->
+    <li class="nav-item toggle-btn" @click="toggleSidebar">
+      <i class="bi" :class="expanded ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
+    </li>
 
-      <ul class="nav flex-column">
+    <!-- Toggle button for expanding/collapsing -->
 
-        <!--Home-->
-        <li class="nav-item">
-          <router-link to="/home" class="nav-link">
-            <i class="bi bi-house-door-fill"></i>
-            <span v-if= "expanded" class="tooltip-text">Home</span>
-          </router-link>
-        </li>
+    <ul class="nav flex-column">
 
-        <!--Sucursales-->
-        <li class="nav-item">
-          <router-link to="/sucursales" class="nav-link">
-            <i class="bi bi-shop-window"></i>
-            <span v-if= "expanded" class="tooltip-text">Sucursales</span>
-          </router-link>
-        </li>
+      <!--Home-->
+      <li class="nav-item">
+        <router-link to="/home" class="nav-link">
+          <i class="bi bi-house-door-fill"></i>
+          <span v-if="expanded" class="tooltip-text">Home</span>
+        </router-link>
+      </li>
 
-        <!--Usuario-->
-        <li class="nav-item">
-          <router-link to="/usuarios" class="nav-link">
-            <i class="bi bi-person-fill"></i>
-            <span v-if= "expanded" class="tooltip-text">Usuarios</span>
-          </router-link>
-        </li>
-        
-      </ul>
+      <!--Sucursales-->
+      <li class="nav-item">
+        <router-link to="/sucursales" class="nav-link">
+          <i class="bi bi-shop-window"></i>
+          <span v-if="expanded" class="tooltip-text">Sucursales</span>
+        </router-link>
+      </li>
 
-      <div id="aside-line"></div>
+      <!--Usuario-->
+      <li class="nav-item">
+        <router-link to="/usuarios" class="nav-link">
+          <i class="bi bi-person-fill"></i>
+          <span v-if="expanded" class="tooltip-text">Usuarios</span>
+        </router-link>
+      </li>
 
-      <!--Configuracion-->
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <router-link to="/config-page" class="nav-link">
-            <i class="bi bi-gear-fill"></i>
-            <span v-if="expanded" class="tooltip-text">Configuracion</span>
-          </router-link>
-        </li>
+    </ul>
 
-        <!--Cerrar sesion-->
-        <li class="nav-item">
-          <a class="nav-link" style="cursor: pointer;">
-            <i class="bi bi-box-arrow-right"></i>
-            <span v-if="expanded" class="tooltip-text">Cerrar sesión</span>
-          </a>
-        </li>
+    <div id="aside-line"></div>
 
-        <!-- Toggle Dark Mode -->
-        <li class="nav-item toggle-btn">
-            <i class="bi bi-moon-stars-fill"></i>                  
-          </li>
-      </ul>
+    <!--Configuracion-->
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <router-link to="/config-page" class="nav-link" >
+          <i class="bi bi-gear-fill"></i>
+          <span v-if="expanded" class="tooltip-text">Configuracion</span>
+        </router-link>
+      </li>
 
-    </aside>
-  </template>
-  
-  <script>
-  export default {
-    name: "AppSidebar",
-    props: {
-      expanded:{
-        type: Boolean,
-        required: true,
-      },
+      <!--Cerrar sesion-->
+      <li class="nav-item">
+        <a class="nav-link" style="cursor: pointer;">
+          <i class="bi bi-box-arrow-right"></i>
+          <span v-if="expanded" class="tooltip-text">Cerrar sesión</span>
+        </a>
+      </li>
+
+      <!-- Toggle Dark Mode -->
+      <li class="nav-item toggle-btn">
+        <i class="bi bi-moon-stars-fill"></i>
+      </li>
+    </ul>
+
+  </aside>
+</template>
+
+<script>
+export default {
+  name: "AppSidebar",
+  props: {
+    expanded: {
+      type: Boolean,
+      required: true,
     },
-    methods: {
-      toggleSidebar() {
-        this.$emit('toggle-sidebar');
-      },
-      expandSidebar() {
-            this.$emit('expand-sidebar'); // Emitir evento para expandir
-      },
-        collapseSidebar() {
-            this.$emit('collapse-sidebar'); // Emitir evento para contraer
-      },
+  },
+  methods: {
+    toggleSidebar() {
+      this.$emit('toggle-sidebar');
     },
-  };
-  </script>
-  
+    expandSidebar() {
+      this.$emit('expand-sidebar'); // Emitir evento para expandir
+    },
+    collapseSidebar() {
+      this.$emit('collapse-sidebar'); // Emitir evento para contraer
+    },
+  },
+};
+</script>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
-    font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .app-wrapper {
-    display: flex;
-    min-height: 100vh;
+  display: flex;
+  min-height: 100vh;
 }
 
 #aside-line {
-    width: 60%;
-    height: 1px;
-    background-color: #c09d62;
-    margin: 10px auto;
+  width: 60%;
+  height: 1px;
+  background-color: #c09d62;
+  margin: 10px auto;
 }
 
 
 a.nav-link {
-    display: flex;
-    justify-content: flex-start;
-    /* Alinea el contenido a la izquierda */
+  display: flex;
+  justify-content: flex-start;
+  /* Alinea el contenido a la izquierda */
 }
 
 /* 
@@ -117,94 +120,88 @@ ul.nav {
  */
 
 .main-content.expanded {
-    padding-left: 0px;
-    z-index: 1;
+  padding-left: 0px;
+  z-index: 1;
 }
 
 .main-content {
-    margin-left: 80px;
-    padding: 20px;
-    width: 100%;
-    transition: margin-left 0.3s ease, background-color 0.3s ease;
-    background-color: #f5f5f5;
+  margin-left: 80px;
+  padding: 20px;
+  width: 100%;
+  transition: margin-left 0.3s ease, background-color 0.3s ease;
+  background-color: #f5f5f5;
 }
 
 /*.main-content.dark */
 
 /* Estilo del botón de expansión/retracción del AppSidebar */
 .toggle-btn {
-    background-color: #d4d4d4;
-    border-radius: 50%;
-
-    padding: 5px;
-    cursor: pointer;
-    text-align: center;
-    margin: 10px auto;
-
-    display: flex;
-    justify-content: center;
-
-    align-items: center;
-    width: 40px;
-
-    height: 40px;
-
-    position: relative;
-
-    flex-shrink: 0;
-
+  background-color: #d4d4d4;
+  border-radius: 50%;
+  /* Mantiene la forma circular */
+  padding: 5px;
+  cursor: pointer;
+  text-align: center;
+  margin: 10px auto;
+  /* Centra horizontalmente */
+  display: flex;
+  justify-content: center;
+  /* Una sola vez es suficiente */
+  align-items: center;
+  width: 40px;
+  /* Ancho fijo */
+  height: 40px;
+  /* Alto fijo */
+  position: relative;
+  /* Esto está bien si no usas `absolute` en hijos o elementos relacionados */
+  flex-shrink: 0;
+  /* Evita que se encoja con el sidebar */
 }
 
 .tooltip-text {
-    margin-left: 10px;
-    font-weight: bold;
-    font-size: 15px;
+  margin-left: 10px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .nav-list {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
-  
+
 .nav-item {
-    margin-bottom: 0.10vh;
-    position: relative;
-    justify-content: center;
+  margin-bottom: 0.10vh;
+  position: relative;
+  justify-content: center;
 }
-  
+
 .nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    /*Alinea los iconos a la izquierda */
-    color: #c09d62;
-    text-decoration: none;
-    padding: 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /*Alinea los iconos a la izquierda */
+  color: #c09d62;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
-  
+
 .nav-link i {
-    font-size: 3.5vh;
-    /* Tamaño uniforme para los íconos */
-    color: inherit;
-    /* Hereda el color del texto */
+  font-size: 3.5vh;
+  /* Tamaño uniforme para los íconos */
+  color: inherit;
+  /* Hereda el color del texto */
 }
 
 .nav-link:hover {
-    background-color: #dadada;
+  background-color: #dadada;
 }
 
-.nav-link.active {
-    background-color: #d4d4d4;
-    color: #79552f;
-    /* Color del texto y los íconos en estado activo */
-}
-
-/* Estilos y layout del sidebar*/ 
+/* Estilos y layout del sidebar*/
 .sidebar {
   width: 80px;
-  background-color:#ebebeb;
+  background-color: #ebebeb;
   position: fixed;
   height: 100%;
   padding-top: 20px;
@@ -216,15 +213,16 @@ ul.nav {
 }
 
 .sidebar.expanded {
-    width: 250px; /*Tamaño del sidebar al esta expandido */
+  width: 250px;
+  /*Tamaño del sidebar al esta expandido */
 
-    .nav-item{
-        padding-left: 40px
-    }
+  .nav-item {
+    padding-left: 40px
+  }
 
-    .toggle-btn{
-        padding: 0;
-    }
+  .toggle-btn {
+    padding: 0;
+  }
 }
 
 /*.sidebar a.navlink */
@@ -268,9 +266,7 @@ ul.nav {
 }
 
 .link-text {
-    margin-left: 10px;
-    transition: opacity 0.3s ease;
+  margin-left: 10px;
+  transition: opacity 0.3s ease;
 }
-  
 </style>
-  
