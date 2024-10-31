@@ -7,78 +7,83 @@
     </div>
     <hr>
     <div class="config-wrapper">
-      <div class="company-config">
-        <form autocomplete="off" class="formulario form-company">
-          <fieldset :disabled="businessEditing">
+      <div class="usuario-config">
+        <form autocomplete="off" class="formulario form-basic-user">
+          <fieldset :disabled="usuarioEditing" >
             <div class="contenedor-titulo">
-              <h2 class="titulo-form">Configuración Empresa</h2>
-            </div>
-
-            <div class="contenedor-principal">
-              <div class="contenedor-interno contenedor-izquierdo">
-                <label for="nombre-company">Nombre de la empresa:</label>
-                <input type="text" id="nombre-company" name="nombre-company" required />
-
-
-                <label for="telefono-empresa">Telefono principal:</label>
-                <input type="text" id="telefono-empresa" name="telefono-empresa" required />
-
-
-                <label for="correo-principal">Correo principal:</label>
-                <input type="email" id="correo-principal" principal de la empresa name="correo" required />
-              </div>
-            </div>
-          </fieldset>
-          <div class="botones-container">
-            <button class="btn editar" @click="isEditing(1)" :disabled="!businessEditing">Editar</button>
-            <button class="btn guardar" :disabled="businessEditing">Guardar</button>
+            <h2 class="titulo-form">Configuración</h2>
           </div>
 
+          <div class="contenedor-principal">
+            <div class="contenedor-interno contenedor-izquierdo">
+              <label for="nombre-usuario">Nombre de usuario:</label>
+              <input type="text" id="nombre-usuario" name="nombre-usuario" required />
 
-          <!-- Fecha de inicio -->
+
+              <label for="telefono">Teléfono:</label>
+              <input type="text" id="telefono" name="telefono" required />
+
+
+              <label for="direccion">Dirección:</label>
+              <input type="text" id="direccion" name="direccion" required />
+            </div>
+
+
+            <div class="contenedor-interno contenedor-derecho">
+              <label for="contrasena">Contraseña actual:</label>
+              <input type="password" id="input-codigo-contrasena" name="contrasena" required />
+
+
+              <label for="contrasena-nueva">Contraseña nueva:</label>
+              <input type="password" id="contrasena-nueva" name="contrasena-nueva" required />
+
+
+              <label for="contrasena-confirmar">Confirmar contraseña:</label>
+              <input type="password" id="contrasena-confirmar" name="contrasena-confirmar" required />
+            </div>
+            
+          </div>
+          </fieldset>
+          
+
+          <div class="botones-container">
+              <button class="btn editar" @click="isEditing(1)" :disabled="!usuarioEditing" >Editar</button>
+              <button class="btn guardar" :disabled="usuarioEditing" >Guardar</button>
+            </div>
         </form>
 
-        <form autocomplete="off" class="formulario form-company-SAR">
-          <fieldset :disabled="busisnessSarEditing">
+        <form autocomplete="off" class="formulario form-avanced-user">
+          <fieldset :disabled="usuarioAvancedEditing" >
             <div class="contenedor-titulo">
-              <h2 class="titulo-form">Configuración SAR</h2>
-            </div>
-
-            <div class="contenedor-principal">
-              <div class="contenedor-interno contenedor-izquierdo">
-                <label for="categoria">Numero CAI:</label>
-                <input type="text" id="numero_cai" name="numero_cai" required />
-
-                <!-- Porcentaje de descuento -->
-                <label for="rango_inical">Rango Inicial:</label>
-                <input type="number" id="rango_inical" name="rango_inical" required />
-
-                <label for="rango_inical">Rango Final:</label>
-                <input type="number" id="rango_final" name="rango_final" required />
-              </div>
-              <!-- Categoria ID -->
-              <div class="contenedor-interno contenedor-derecho">
-                <label for="fecha_autorizacion">Fecha de autorización:</label>
-                <input type="date" id="fecha_autorizacion" name="fecha_autorizacion" required />
-
-                <!-- Fecha final -->
-                <label for="fecha_vencimiento">Fecha de vencimiento:</label>
-                <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" required />
-
-                <!-- Enviar el formulario -->
-              </div>
-            </div>
-          </fieldset>
-
-          <div class="botones-container">
-            <button class="btn editar" @click="isEditing(2)" :disabled="!busisnessSarEditing">Editar</button>
-            <button class="btn guardar" :disabled="busisnessSarEditing">Guardar</button>
+            <h2 class="titulo-form">Configuración avanzada</h2>
           </div>
 
+          <div class="contenedor-principal">
+            <div class="contenedor-interno contenedor-izquierdo">
+              <label for="Nombre">Nombre:</label>
+              <input type="text" id="Nombre" name="Nombre" required />
+
+
+              <label for="apellido">Apellido:</label>
+              <input type="text" id="apellido" name="apellido" required />
+
+
+              <label for="correo">Correo:</label>
+              <input type="email" id="correo" name="correo" required />
+            </div>
+          </div>
+
+          </fieldset>
+          
+          <div class="botones-container">
+              <button class="btn editar" @click="isEditing(2)" :disabled="!usuarioAvancedEditing" >Editar</button>
+              <button class="btn guardar" :disabled="usuarioAvancedEditing" >Guardar</button>
+            </div>
 
           <!-- Fecha de inicio -->
         </form>
       </div>
+
     </div>
   </div>
   
@@ -95,32 +100,43 @@ export default {
   },
   data() {
     return {
-      businessEditing: true,
-      busisnessSarEditing: true,
-      companyForm: [{
-        nombre: '',
-        apellido: '',
-        correo: '',
+      usuarioEditing: true,
+      usuarioAvancedEditing: true,
+      userForm: [{
+        nombreUsuario: '',
+          telefono: '',
+          direccion: '',
+          contrasena_actual: '',
+          contrasena_nueva: '',
+          contrasena_confirm: '',
       }],
+
+      userFormAdvanced: [
+        {
+          nombre: '',
+          apellido: '',
+          correo: '',
+        }
+      ],
     };
   },
   methods: {
 
     pushEsc(event) {
       if (event.key === "Esc" || event.key === "Escape") {
-        this.busisnessSarEditing = true;
-        this.businessEditing = true;
+        this.usuarioAvancedEditing = true;
+        this.usuarioEditing = true;
       }
     },
 
     isEditing(orden) {
       switch (orden) {
-        case 1: this.businessEditing = false;
-                this.busisnessSarEditing = true;
+        case 1: this.usuarioEditing = false;
+                this.usuarioAvancedEditing = true;
         break;
 
-        case 2: this.busisnessSarEditing = false;
-                this.businessEditing = true;
+        case 2: this.usuarioAvancedEditing = false;
+                this.usuarioEditing = true;
         break;
 
         default:

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeList from '../Pages/HomeList.vue'
-import SucursalesList from '@/Pages/SucursalesList.vue'
+import EmpresasList from '@/Pages/EmpresasList.vue'
 import UsuariosList from '@/Pages/UsuariosList.vue'
 import ConfigPage from '@/Pages/ConfigPage.vue'
 
@@ -13,9 +13,9 @@ const router = createRouter({
       component: HomeList
     },
     {
-      path: '/sucursales',
-      name: 'sucursales',
-      component: SucursalesList
+      path: '/empresas',
+      name: 'empresas',
+      component: EmpresasList
     },
     {
       path: '/usuarios',

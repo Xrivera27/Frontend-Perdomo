@@ -1,15 +1,15 @@
 <template>
   <div class="encabezado">
-    <h1>Administracion Sucursales</h1>
+    <h1>Administracion Empresas</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>
 
-  <div class="sucursales-wrapper">
+  <div class="empresas-wrapper">
     <div class="opciones">
       <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">
-        Agregar sucursales</button>
-      <ExportButton :columns="columns" :rows="rows" fileName="Sucursales.pdf" class="export-button"/>
+        Agregar Empresas</button>
+      <ExportButton :columns="columns" :rows="rows" fileName="Empresas.pdf" class="export-button"/>
 
       <div class="registros">
         <span> Mostrar
@@ -25,7 +25,7 @@
       </div>
 
       <!--Barra de busqueda-->
-      <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar sucursal...." />
+      <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empresas...." />
     </div>
 
     <div class="table-container">
@@ -42,18 +42,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(sucursal,index) in paginatedSucursales" :key="index">
+          <tr v-for="(empresa,index) in paginatedEmpresas" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ sucursal.nombre }}</td>
-            <td>{{ sucursal.ciudad }}</td>
-            <td>{{ sucursal.telefono }}</td>
-            <td>{{ sucursal.direccion }}</td>
-            <td>{{ sucursal.correo }}</td>
+            <td>{{ empresa.nombre }}</td>
+            <td>{{ empresa.ciudad }}</td>
+            <td>{{ empresa.telefono }}</td>
+            <td>{{ empresa.direccion }}</td>
+            <td>{{ empresa.correo }}</td>
             <td>
-            <button id="btnEditar" class="btn btn-warning" @click="editSucursal(index)">
+            <button id="btnEditar" class="btn btn-warning" @click="editEmpresas(index)">
               <i class="bi bi-pencil-fill"></i>
             </button>
-            <button id="btnEliminar" class="btn btn-danger" @click="deleteSucursal(index)"><b><i
+            <button id="btnEliminar" class="btn btn-danger" @click="deleteEmpresa(index)"><b><i
               class="bi bi-x-lg"></i></b></button>
             </td>
           </tr>
@@ -63,33 +63,33 @@
     </div>
 
 
-    <!-- Modal para agregar o editar sucursales-->
+    <!-- Modal para agregar o editar empresas-->
     <div v-if="isModalOpen" class="modal">
       <div class="modal-content">
-        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Sucursal' : 'Agregar Sucursal' }} </h2>
+        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Empresa' : 'Agregar Empresa' }} </h2>
 
         <div class="form-group">
           <label>Nombre:</label>
-          <input v-model="sucursalForm.nombre" type="text" required>
+          <input v-model="empresaForm.nombre" type="text" required>
         </div>
 
         <div class="form-group">
           <label>Correo:</label>
-          <input v-model="sucursalForm.correo" type="text" required>
+          <input v-model="empresaForm.correo" type="text" required>
         </div>
 
         <div class="form-group">
           <label>Telefono:</label>
-          <input v-model="sucursalForm.telefono" type="text" required>
+          <input v-model="empresaForm.telefono" type="text" required>
         </div>
 
         <div class="form-group">
           <label>Dirección:</label>
-          <input v-model="sucursalForm.direccion" type="text" required>
+          <input v-model="empresaForm.direccion" type="text" required>
         </div>
 
-        <button id="AddSucursalModal" class="btn btn-primary" @click="guardarSucursal">
-          {{ isEditing ? 'Guardar Cambios' : 'Agregar Sucursal' }}
+        <button id="AddEmpresaModal" class="btn btn-primary" @click="guardarEmpresa">
+          {{ isEditing ? 'Guardar Cambios' : 'Agregar Empresa' }}
         </button>
         <button id="BtnCerrar" class="btn btn-secondary" @click="closeModal">Cerrar</button>
       </div>
@@ -116,7 +116,7 @@ export default {
       isModalOpen: false,
       isEditing: false,
       editIndex: null,
-      sucursalForm: {
+      empresaForm: {
         nombre: '',
         ciudad: '',
         telefono: '',
@@ -124,48 +124,20 @@ export default {
         correo: '',
       },
 
-      sucursales: [
+      empresas: [
         {
-          nombre: 'Sucursal principal',
-          ciudad: 'La Ceiba',
+          nombre: 'Libreria Coello',
+          ciudad: 'San Pedro Sula',
           telefono: '555 57 67',
           direccion: 'calle 27 # 40 - 36',
           correo: 'ejemplocorreo',
         },
         {
-          nombre: 'Sucursal norte',
+          nombre: 'Panaderia y Reposteria Las Espigas',
           ciudad: 'San Pedro Sula',
           telefono: '504 22 33 44',
           direccion: 'avenida 10, zona norte',
           correo: 'norte@empresa.com',
-        },
-        {
-          nombre: 'Sucursal sur',
-          ciudad: 'Tegucigalpa',
-          telefono: '504 33 44 55',
-          direccion: 'avenida 5, barrio centro',
-          correo: 'sur@empresa.com',
-        },
-        {
-          nombre: 'Sucursal este',
-          ciudad: 'Choluteca',
-          telefono: '504 11 22 33',
-          direccion: 'calle 12, zona este',
-          correo: 'este@empresa.com',
-        },
-        {
-          nombre: 'Sucursal oeste',
-          ciudad: 'Comayagua',
-          telefono: '504 77 88 99',
-          direccion: 'carrera 4, barrio oeste',
-          correo: 'oeste@empresa.com',
-        },
-        {
-          nombre: 'Sucursal central',
-          ciudad: 'La Esperanza',
-          telefono: '504 44 55 66',
-          direccion: 'plaza principal, zona centro',
-          correo: 'central@empresa.com',
         },
       ],
 
@@ -182,17 +154,17 @@ export default {
   },
 
   computed: {
-    filteredSucursales() {
-      // Filtra los sucursales basados en el texto de busqueda
-      return this.sucursales.filter(sucursal =>
-        sucursal.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        sucursal.ciudad.includes(this.searchQuery)
+    filteredEmpresas() {
+      // Filtra las empresas basados en el texto de busqueda
+      return this.empresas.filter(empresa =>
+        empresa.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        empresa.ciudad.includes(this.searchQuery)
       );
     },
-    paginatedSucursales() {
+    paginatedEmpresas() {
       return this.itemsPerPage === "" || this.itemsPerPage === null
-        ? this.filteredSucursales
-        : this.filteredSucursales.slice(0, this.itemsPerPage);
+        ? this.filteredEmpresas
+        : this.filteredEmpresas.slice(0, this.itemsPerPage);
     },
   },
   methods: {
@@ -203,7 +175,7 @@ export default {
     closeModal() {
       this.isModalOpen = false;
       this.isEditing = false;
-      this.sucursalForm = {
+      this.empresaForm = {
         nombre: '',
         ciudad: '',
         telefono: '',
@@ -212,29 +184,29 @@ export default {
       };
     },
 
-    guardarSucursal() {
+    guardarEmpresa() {
       if(this.isEditing) {
-        Object.assign(this.sucursales[this.editIndex], this.sucursalForm);
+        Object.assign(this.empresas[this.editIndex], this.empresaForm);
       }else{
-        this.sucursales.push({ ...this.sucursalForm});
+        this.empresas.push({ ...this.empresaForm});
       }
       this.closeModal();
     },
 
-    editSucursal(index) {
+    editEmpresas(index) {
       this.isModalOpen = true;
       this.isEditing = true;
       this.editIndex = index;
-      this.sucursalForm = { ...this.sucursales[index] };
+      this.empresaForm = { ...this.empresas[index] };
     },
 
-    deleteSucursal(index) {
-      this.sucursales.splice(index, 1);
+    deleteEmpresa(index) {
+      this.empresas.splice(index, 1);
     },
 
     generateRows() {
-      // Genera las filas basadas en los sucursales paginados
-      this.rows = this.paginatedSucursales.map((sucursal,index) => ({
+      // Genera las filas basadas en las empresas paginados
+      this.rows = this.paginatedEmpresas.map((sucursal,index) => ({
         index: index + 1,
         nombre: sucursal.nombre,
         ciudad: sucursal.ciudad,
@@ -248,7 +220,7 @@ export default {
 
   watch: {
     // Cuando cambie la paginación o el filtro, actualiza las filas
-    paginatedSucursales() {
+    paginatedEmpresas() {
       this.generateRows();
     }
   },
@@ -372,7 +344,7 @@ select {
   border-radius: 5px;
 }
 
-.sucursales-wrapper {
+.empresas-wrapper {
   padding: 16px;
 }
 
@@ -431,7 +403,7 @@ select {
 }
 
 
-#AddSucursalModal {
+#AddEmpresaModal {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;

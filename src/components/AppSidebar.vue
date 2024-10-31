@@ -20,9 +20,9 @@
 
       <!--Sucursales-->
       <li class="nav-item">
-        <router-link to="/sucursales" class="nav-link">
+        <router-link to="/empresas" class="nav-link">
           <i class="bi bi-shop-window"></i>
-          <span v-if="expanded" class="tooltip-text">Sucursales</span>
+          <span v-if="expanded" class="tooltip-text">Empresas</span>
         </router-link>
       </li>
 
