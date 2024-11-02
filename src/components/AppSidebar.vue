@@ -33,6 +33,14 @@
           <span v-if="expanded" class="tooltip-text">Usuarios</span>
         </router-link>
       </li>
+      
+      <!--Proveedores-->
+      <li class="nav-item">
+        <router-link to="/proveedores" class="nav-link">
+          <i class="bi bi-truck"></i>
+          <span v-if="expanded" class="tooltip-text">Usuarios</span>
+        </router-link>
+      </li>
 
     </ul>
 
