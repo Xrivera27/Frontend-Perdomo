@@ -1,14 +1,14 @@
 <template>
   <div class="encabezado">
-    <h1>Proveedores</h1>
+    <h1>Categorias:Empresas</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>
 
-  <div class="proveedores-wrapper">
+  <div class="categorias-empresas-wrapper">
     <div class="opciones">
       <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">
-        Agregar Proveedor
+        Agregar Categoria
       </button>
 
       <div class="registros">
@@ -26,7 +26,7 @@
 
       <!-- Barra de búsqueda -->
       <div class="search-bar">
-        <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar proveedor..." />
+        <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar categoria..." />
       </div>
     </div>
 
@@ -36,26 +36,22 @@
             <tr>
               <th>#</th>
               <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Email</th>
-              <th>Direccion</th>
+              <th>Descripcion</th>
               <th>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(proveedor,index) in paginatedProveedores" :key="index">
+            <tr v-for="(categoria,index) in paginatedCategorias" :key="index">
               <td>{{ index + 1 }}</td>
-              <td>{{ proveedor.nombre }}</td>
-              <td>{{ proveedor.telefono }}</td>
-              <td>{{ proveedor.email }}</td>
-              <td>{{ proveedor.direccion }}</td>
+              <td>{{ categoria.nombre }}</td>
+              <td>{{ categoria.descripcion }}</td>
               <td>
-                <button id="btnEditar" class="btn btn-warning" @click="editProveedor(index)">
+                <button id="btnEditar" class="btn btn-warning" @click="editCategoria(index)">
                   <i class="bi bi-pencil-fill"></i>
                 </button>
 
-                <button id="btnEliminar" class="btn btn-danger" @click="deleteProveedor(index)">
+                <button id="btnEliminar" class="btn btn-danger" @click="deleteCategorias(index)">
                   <b><i class="bi bi-x-lg"></i></b>
                 </button>
               </td>
@@ -64,33 +60,23 @@
         </table>
       </div>
 
-      <!-- Modal para agregar i editar proveedores-->
+      <!-- Modal para agregar y editar categorias-->
        <div v-if="isModalOpen" class="modal">
         <div class="modal-content">
-          <h2 class="h2-modal-content">{{ isEditing ? 'Editar Proveedor' :'Agregar Proveedor' }}</h2>
+          <h2 class="h2-modal-content">{{ isEditing ? 'Editar Categoria' :'Agregar Categoria' }}</h2>
 
           <div class="form-group">
             <label>Nombre:</label>
-            <input v-model="proveedorForm.nombre" type="text" required>
-          </div>
-
-          <div id= "form-tel" class="form-group">
-            <label>Teléfono:</label>
-            <input v-model="proveedorForm.telefono" type="text" required>
+            <input v-model="categoriaForm.nombre" type="text" required>
           </div>
 
           <div class="form-group">
-            <label>Email:</label>
-            <input v-model="proveedorForm.email" type="text" required>
+            <label>Descripcion:</label>
+            <input v-model="categoriaForm.descripcion" type="text" required>
           </div>
 
-          <div class="form-group">
-            <label>Dirección:</label>
-            <input v-model="proveedorForm.direccion" type="text" required>
-          </div>
-
-          <button id="AddProveedorModal" class="btn btn-primary" @click="guardarProveedor">
-            {{ isEditing ? 'Guardar cambios': 'Agregar Proveedor' }}
+          <button id="AddCategoriaModal" class="btn btn-primary" @click="guardarCategoria">
+            {{ isEditing ? 'Guardar cambios': 'Agregar Categoria' }}
           </button>
 
           <button id="btnCerrar" class="btn btn-secundary" @click="closeModal">Cerrar</button>
@@ -114,52 +100,33 @@ export default {
       isEditing: false,
       editIndex: null,
       itemsPerPage: "",
-      proveedorForm: {
+      categoriaForm: {
         nombre: '',
-        telefono: '',
-        email: '',
-        direccion: '',
+        descripcion: '',
       },
-      proveedores: [
-        { nombre: 'Juan Villegas', telefono: '555 57 67', email: 'Juanavillega@gmail.com', direccion: 'calle 27 # 40 - 36' },
-        { nombre: 'Marta Pérez', telefono: '123 45 67', email: 'martaperez@gmail.com', direccion: 'avenida 15 # 20 - 40' },
-        { nombre: 'Carlos Ramírez', telefono: '987 65 43', email: 'carlosramirez@gmail.com', direccion: 'calle 10 # 12 - 50' },
-        { nombre: 'Ana Gómez', telefono: '654 32 10', email: 'anagomez@gmail.com', direccion: 'carrera 7 # 8 - 60' },
-        { nombre: 'Luis Fernández', telefono: '432 10 98', email: 'luisfernandez@gmail.com', direccion: 'calle 8 # 9 - 70' },
-        { nombre: 'Pedro Sánchez', telefono: '789 01 23', email: 'pedrosanchez@gmail.com', direccion: 'calle 5 # 6 - 80' },
-        { nombre: 'Claudia Rodríguez', telefono: '567 89 01', email: 'claudiarodriguez@gmail.com', direccion: 'avenida 9 # 10 - 90' },
-        { nombre: 'Gabriel López', telefono: '345 67 89', email: 'gabriellopez@gmail.com', direccion: 'calle 3 # 4 - 100' },
-        { nombre: 'Julia Castillo', telefono: '234 56 78', email: 'juliacastillo@gmail.com', direccion: 'carrera 5 # 6 - 110' },
-        { nombre: 'Andrés Ríos', telefono: '890 12 34', email: 'andresrios@gmail.com', direccion: 'calle 4 # 5 - 120' },
-        { nombre: 'Sofía Torres', telefono: '567 89 12', email: 'sofiatorres@gmail.com', direccion: 'carrera 6 # 7 - 130' },
-        { nombre: 'Ricardo Morales', telefono: '234 78 90', email: 'ricardomorales@gmail.com', direccion: 'avenida 3 # 4 - 140' },
-        { nombre: 'Carolina Vargas', telefono: '890 34 56', email: 'carolinavargas@gmail.com', direccion: 'calle 2 # 3 - 150' },
-        { nombre: 'Eduardo Herrera', telefono: '123 56 78', email: 'eduardoherrera@gmail.com', direccion: 'carrera 2 # 3 - 160' },
-        { nombre: 'Patricia Medina', telefono: '456 78 90', email: 'patriciamedina@gmail.com', direccion: 'avenida 7 # 8 - 170' },
-        { nombre: 'Miguel Ortiz', telefono: '789 23 45', email: 'miguelortiz@gmail.com', direccion: 'calle 1 # 2 - 180' },
-        { nombre: 'Diana Ruiz', telefono: '234 90 12', email: 'dianaruiz@gmail.com', direccion: 'carrera 4 # 5 - 190' },
-        { nombre: 'Javier Mendoza', telefono: '567 12 34', email: 'javiermendoza@gmail.com', direccion: 'avenida 6 # 7 - 200' },
-        { nombre: 'Gloria Peña', telefono: '890 45 67', email: 'gloriapena@gmail.com', direccion: 'calle 7 # 8 - 210' },
-        { nombre: 'Fernando Castro', telefono: '123 67 89', email: 'fernandocastro@gmail.com', direccion: 'carrera 3 # 4 - 220' }
+      categorias: [
+        { nombre: 'CategoriaEmpresa #1', descripcion:'descripcion #1' },
+        { nombre: 'CategoriaEmpresa #2', descripcion:'descripcion #2' },
+        { nombre: 'CategoriaEmpresa #3', descripcion:'descripcion #3' },
       ]
     };
   },
 
   computed: {
-    filteredProveedores() {
-      // Filtra los proveedores basados en el texto de búsqueda
-      return this.proveedores.filter(proveedor =>
-        proveedor.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        proveedor.telefono.includes(this.searchQuery)
+    filteredCategorias() {
+      // Filtra las categorias basados en el texto de búsqueda
+      return this.categorias.filter(categoria =>
+        categoria.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        categoria.descripcion.includes(this.searchQuery)
       );
     },
 
-    paginatedProveedores() {
+    paginatedCategorias() {
 
       if (this.itemsPerPage === "" || this.itemsPerPage === null) {
-        return this.filteredProveedores;
+        return this.filteredCategorias;
       } else {
-        return this.filteredProveedores.slice(0, parseInt(this.itemsPerPage));
+        return this.filteredCategorias.slice(0, parseInt(this.itemsPerPage));
       }
     }
 
@@ -176,35 +143,33 @@ export default {
     },
 
     clearForm() {
-      this.proveedorForm = {
+      this.categoriaForm = {
         nombre: '',
-        telefono: '',
-        email: '',
-        direccion: '',
+        descripcion: '',
       }
       this.isEditing = false;
       this.editIndex = null;
     },
 
 
-    guardarProveedor() {
+    guardarCategoria() {
       if (this.isEditing) {
-        this.proveedores[this.editIndex] = {...this.proveedorForm};
+        this.categorias[this.editIndex] = {...this.categoriaForm};
       }else {
-        this.proveedores.push({...this.proveedorForm});
+        this.categorias.push({...this.categoriaForm});
       }
       this.closeModal();
     },
 
-    editProveedor(index) {
-      this.proveedorForm = {...this.proveedores[index]};
+    editCategoria(index) {
+      this.categoriaForm = {...this.categorias[index]};
       this.isEditing = true;
       this.editIndex = index;
       this.openModal();
     },
 
-    deleteProveedor(index) {
-      this.proveedores.splice(index, 1);
+    deleteCategorias(index) {
+      this.categorias.splice(index, 1);
     },
   },
 };
@@ -223,7 +188,7 @@ export default {
   align-items: center;
 }
 
-.proveedores-wrapper {
+.categorias-empresas-wrapper {
   padding: 16px;
 }
 
@@ -463,7 +428,7 @@ h1 {
   justify-content: center;
 }
 
-#AddProveedorModal {
+#AddCategoriaModal {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;

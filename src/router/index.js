@@ -3,7 +3,8 @@ import HomeList from '../Pages/HomeList.vue'
 import EmpresasList from '@/Pages/EmpresasList.vue'
 import UsuariosList from '@/Pages/UsuariosList.vue'
 import ConfigPage from '@/Pages/ConfigPage.vue'
-import ProveedoresList from '@/Pages/ProveedoresList.vue'
+import CategoriasEmpresasList from '@/Pages/CategoriasEmpresasList.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,9 +32,9 @@ const router = createRouter({
     },
 
     {
-      path: '/proveedores',
-      name: 'proveedores',
-      component: ProveedoresList,
+      path: '/categorias-empresas',
+      name: 'categorias-empresas',
+      component: CategoriasEmpresasList,
     },
 
     {

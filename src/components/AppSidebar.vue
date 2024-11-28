@@ -11,7 +11,7 @@
     <ul class="nav flex-column">
 
       <!--Home-->
-      <li class="nav-item">
+      <li class="nav-item" :class="{active :isActive('/home')}">
         <router-link to="/home" class="nav-link">
           <i class="bi bi-house-door-fill"></i>
           <span v-if="expanded" class="tooltip-text">Home</span>
@@ -19,7 +19,7 @@
       </li>
 
       <!--Sucursales-->
-      <li class="nav-item">
+      <li class="nav-item" :class="{active :isActive('/empresas')}">
         <router-link to="/empresas" class="nav-link">
           <i class="bi bi-shop-window"></i>
           <span v-if="expanded" class="tooltip-text">Empresas</span>
@@ -27,18 +27,18 @@
       </li>
 
       <!--Usuario-->
-      <li class="nav-item">
+      <li class="nav-item" :class="{active :isActive('/usuarios')}">
         <router-link to="/usuarios" class="nav-link">
           <i class="bi bi-person-fill"></i>
           <span v-if="expanded" class="tooltip-text">Usuarios</span>
         </router-link>
       </li>
       
-      <!--Proveedores-->
-      <li class="nav-item">
-        <router-link to="/proveedores" class="nav-link">
+      <!--Categorias-Empresas-->
+      <li class="nav-item" :class="{active :isActive('/categorias-empresas')}">
+        <router-link to="/categorias-empresas" class="nav-link">
           <i class="bi bi-truck"></i>
-          <span v-if="expanded" class="tooltip-text">Usuarios</span>
+          <span v-if="expanded" class="tooltip-text">Proveedores</span>
         </router-link>
       </li>
 
@@ -48,7 +48,7 @@
 
     <!--Configuracion-->
     <ul class="nav flex-column">
-      <li class="nav-item">
+      <li class="nav-item" :class="{active :isActive('/config-page')}">
         <router-link to="/config-page" class="nav-link" >
           <i class="bi bi-gear-fill"></i>
           <span v-if="expanded" class="tooltip-text">Configuracion</span>
@@ -91,6 +91,9 @@ export default {
     collapseSidebar() {
       this.$emit('collapse-sidebar'); // Emitir evento para contraer
     },
+    isActive(route) {
+      return this.$route.path === route;
+    },
   },
 };
 </script>
@@ -121,12 +124,6 @@ a.nav-link {
   /* Alinea el contenido a la izquierda */
 }
 
-/* 
-ul.nav {
-    padding: 0 15px;
-}
- */
-
 .main-content.expanded {
   padding-left: 0px;
   z-index: 1;
@@ -139,8 +136,6 @@ ul.nav {
   transition: margin-left 0.3s ease, background-color 0.3s ease;
   background-color: #f5f5f5;
 }
-
-/*.main-content.dark */
 
 /* Estilo del botón de expansión/retracción del AppSidebar */
 .toggle-btn {
@@ -170,6 +165,11 @@ ul.nav {
   margin-left: 10px;
   font-weight: bold;
   font-size: 15px;
+}
+
+.nav {
+    list-style: none;
+    padding: 0;
 }
 
 .nav-list {
@@ -233,12 +233,6 @@ ul.nav {
   }
 }
 
-/*.sidebar a.navlink */
-
-/*.sidebar dark a.navlink */
-
-/*.sidebar a.navlink active */
-
 .sidebar .nav {
   list-style: none;
   padding-left: 0;
@@ -271,6 +265,11 @@ ul.nav {
 
 .sidebar .nav-link:hover .tooltip-text {
   display: block;
+}
+
+.sidebar li.active {
+  background-color: #d4d4d4; /* Color del sombreado */
+  color: #79552f;
 }
 
 .link-text {
