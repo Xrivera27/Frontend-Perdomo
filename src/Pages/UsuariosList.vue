@@ -7,27 +7,27 @@
 
   <div class="empleados-wrapper">
     <div class="opciones">
-    <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">Agregar
-      Usuario</button>
+      <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">Agregar
+        Usuario</button>
 
-    <div class="registros">
-      <span>Mostrar
-        <select v-model="itemsPerPage" class="custom-select">
-          <option value="">Todos</option>
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
-          <option value="25">25</option>
-        </select> registros
-      </span>
-    </div>
+      <div class="registros">
+        <span>Mostrar
+          <select v-model="itemsPerPage" class="custom-select">
+            <option value="">Todos</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+          </select> registros
+        </span>
+      </div>
 
-    <!-- Barra de búsqueda -->
-    <div class="search-bar">
-      <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empleado..." />
+      <!-- Barra de búsqueda -->
+      <div class="search-bar">
+        <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empleado..." />
+      </div>
     </div>
-  </div>
     <div class="table-container">
       <table class="table">
         <thead>
@@ -69,64 +69,70 @@
       <div class="modal-content">
         <h2 class="h2-modal-content">{{ isEditing ? 'Editar Empleado' : 'Agregar Empleado' }}</h2>
 
-        <div class="form-group">
-          <label>Nombre:</label>
-          <input v-model="empleadoForm.nombre" type="text" required>
-        </div>
+        <div class="contenedor-principal">
+          <div class="contenedor contenedor-izquierdo">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input v-model="empleadoForm.nombre" type="text" required>
+            </div>
 
-        <div class="form-group">
-          <label>Apellido:</label>
-          <input v-model="empleadoForm.apellido" type="text" required>
-        </div>
+            <div class="form-group">
+              <label>Apellido:</label>
+              <input v-model="empleadoForm.apellido" type="text" required>
+            </div>
 
-        <div class="form-group">
-          <label>Nombre de Usuario:</label>
-          <input v-model="empleadoForm.nombreusuario" type="text" required>
-        </div>
+            <div class="form-group">
+              <label>Nombre de Usuario:</label>
+              <input v-model="empleadoForm.nombreusuario" type="text" required>
+            </div>
 
-        <div class="form-group">
-          <label>Correo:</label>
-          <input v-model="empleadoForm.correo" type="text" required>
-        </div>
+            <div class="form-group">
+              <label>Correo:</label>
+              <input v-model="empleadoForm.correo" type="text" required>
+            </div>
+          </div>
 
+          <div class="contenedor contenedor-derecho">
+            <div class="form-group password-group">
+              <label>Contraseña:</label>
+              <div class="password-wrapper">
+                <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
+                <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
+                  @click="togglePasswordVisibility"></i>
+              </div>
+            </div>
 
-        <div class="form-group password-group">
-          <label>Contraseña:</label>
-          <div class="password-wrapper">
-            <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
-            <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
-              @click="togglePasswordVisibility"></i>
+            <div class="form-group password-group">
+              <label>Confirmar Contraseña:</label>
+              <div class="password-wrapper">
+                <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
+                <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
+                  @click="togglePasswordVisibility"></i>
+              </div>
+            </div>
+
+            <div id="form-tel" class="form-group">
+              <label>Telefono:</label>
+              <input v-model="empleadoForm.telefono" type="text" required>
+            </div>
+
+            <div id="form-direc" class="form-group">
+              <label>Direccion:</label>
+              <input v-model="empleadoForm.direccion" type="text" required>
+            </div>
+
+            <div id="form-idenSucursal" class="form-group">
+              <label>Identificacion de Sucursal:</label>
+              <input v-model="empleadoForm.identificarSucursal" type="text" required>
+            </div>
           </div>
         </div>
-
-        <div class="form-group password-group">
-          <label>Confirmar Contraseña:</label>
-          <div class="password-wrapper">
-            <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
-            <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
-              @click="togglePasswordVisibility"></i>
-          </div>
-        </div>
-
-        <div id="form-tel" class="form-group">
-          <label>Telefono:</label>
-          <input v-model="empleadoForm.telefono" type="text" required>
-        </div>
-
-        <div id="form-direc" class="form-group">
-          <label>Direccion:</label>
-          <input v-model="empleadoForm.direccion" type="text" required>
-        </div>
-
-        <div id="form-idenSucursal" class="form-group">
-          <label>Identificacion unico de Sucursal:</label>
-          <input v-model="empleadoForm.identificarSucursal" type="text" required>
-        </div>
-
+        <!--Boton de Guardar y cerrar-->
         <button id="AddEmpleadoModal" class="btn btn-primary" @click="guardarEmpleado">
           {{ isEditing ? 'Guardar Cambios' : 'Agregar Empleado' }}
         </button>
         <button id="BtnCerrar" class="btn btn-secondary" @click="closeModal">Cerrar</button>
+
       </div>
     </div>
   </div>
@@ -157,9 +163,9 @@ export default {
         identificarSucursal: '',
       },
       empleados: [
-        {nombre: 'Carlos', apellido: 'Sosa', nombreusuario: 'Ernest', contraseña: '********',correo: 'trabajososa@gmail.com', telefono: '99765432', direccion: 'Col. La Pradera'},
-        {nombre: 'Ada', apellido: 'Selina', nombreusuario: 'Selena', contraseña: '******',correo: 'adaselina@gmail.com', telefono: '97654321', direccion: 'Col. Pizzaty'},
-        {nombre: 'Leonel', apellido: 'Salinas', nombreusuario: 'Sol', contraseña: '*****',correo: 'leoslinas@gmail.com', telefono: '97896743', direccion: 'Col. Las Acacias'},
+        { nombre: 'Carlos', apellido: 'Sosa', nombreusuario: 'Ernest', contraseña: '********', correo: 'trabajososa@gmail.com', telefono: '99765432', direccion: 'Col. La Pradera' },
+        { nombre: 'Ada', apellido: 'Selina', nombreusuario: 'Selena', contraseña: '******', correo: 'adaselina@gmail.com', telefono: '97654321', direccion: 'Col. Pizzaty' },
+        { nombre: 'Leonel', apellido: 'Salinas', nombreusuario: 'Sol', contraseña: '*****', correo: 'leoslinas@gmail.com', telefono: '97896743', direccion: 'Col. Las Acacias' },
       ]
 
     };
@@ -234,6 +240,7 @@ export default {
 * {
   font-family: 'Montserrat', sans-serif;
 }
+
 h1 {
   color: #d6b602;
 }
@@ -243,8 +250,8 @@ h1 {
   justify-content: space-between;
 }
 
-.opciones{
-  display:flex;
+.opciones {
+  display: flex;
   align-items: center;
   justify-content: space-between;
 }
@@ -257,7 +264,7 @@ h1 {
   border-width: 0.5px;
 }
 
-.registros{
+.registros {
   height: 100%;
   padding-bottom: 1%;
 }
@@ -272,12 +279,12 @@ h1 {
   font-weight: bold;
 }
 
-.export-button{
+.export-button {
   margin: 0;
 }
 
-.opciones{
-  display:flex;
+.opciones {
+  display: flex;
   align-items: center;
   justify-content: space-between;
 }
@@ -429,8 +436,8 @@ select {
   border: none;
   border-radius: 4px;
   font-size: 1rem;
-  color: #fff;
-  background-color: #007bff;
+  color: black;
+  background-color: #c09d62;
   cursor: pointer;
   margin-right: 1rem;
 }
@@ -452,6 +459,16 @@ select {
   border-radius: 4px;
   max-width: 500px;
   width: 100%;
+}
+
+.contenedor-principal {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.contenedor {
+  width: 45%;
 }
 
 .form-group {
@@ -525,11 +542,11 @@ button {
   color: #000;
 }
 
-#form-tel{
-  width: 30%;
+#form-tel {
+  width: 95%;
 }
 
-#form-direc{
-  width: 30%;
+#form-direc {
+  width: 95%;
 }
 </style>
