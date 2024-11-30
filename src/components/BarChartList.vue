@@ -1,47 +1,51 @@
 <template>
   <div class="dashboard-container">
-    <!-- Tarjetas informativas con iconos de Bootstrap y enlaces "Ver más" -->
     <div class="cards-container">
 
       <div class="card" v-for="(item, index) in cards" :key="index">
         <div class="card-content">
 
           <div class="value-content">
-
-            <h3 {{ item.title }}></h3>
+            <h3>{{ item.title }}</h3>
             <i :class="item.icon" class="card-icon"></i>
             <p class="item-value">{{ item.value }}</p>
           </div>
         </div>
-        <a :href="item.link" class="card-link">Ver más</a>
+        <a href="item.link" class="card-link">Ver más</a>
       </div>
-
     </div>
+
     <div class="graphics-container">
-      <!-- Gráficos -->
+      <!--Graficos de linea y de Pie-->
       <div class="charts-container">
         <div class="line-chart">
-          <LineChart :chart-data="lineChartData" :options="lineChartOptions" />
+          
         </div>
         <div class="pie-chart">
-          <PieChart :chart-data="pieChartData" :options="pieChartOptions" />
+
         </div>
       </div>
     </div>
 
-    <!-- Tabla de últimas sucursales registradas -->
     <table class="sales-table">
       <thead>
         <tr>
           <th>Nombre</th>
-          <th>Descripcion</th>
+          <th>Ciudad</th>
+          <th>Telefono</th>
+          <th>Direccion</th>
+          <th>Correo</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(sale, index) in sales" :key="index">
-          <td>{{ sale.nombre }}</td>
-          <td>{{ sale.descripcion }}</td>
-          <td><a href="#">Ver más</a><span>|</span> <button style="font-size: 1rem;">Descargar</button></td>
+        <tr v-for="(empresa, index) in empresas" :key="index">
+          <td>{{ empresa.nombre }}</td>
+          <td>{{ empresa.ciudad }}</td>
+          <td>{{ empresa.telefono }}</td>
+          <td>{{ empresa.direccion }}</td>
+          <td>{{ empresa.correo }}</td>
+          <td><a href="#">Ver más</a><span>|</span><button style="font-size: 1rem;">Descargar</button></td>
         </tr>
       </tbody>
     </table>
@@ -49,6 +53,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { Line, Pie } from 'vue-chartjs';
 import {
   Chart as ChartJS,
@@ -64,32 +69,31 @@ import {
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, ArcElement, CategoryScale, LinearScale);
 
-export default {
-  name: "BarChartList",
+
+export default defineComponent({
   components: {
     LineChart: Line,
     PieChart: Pie,
   },
   data() {
     return {
-      // Datos para las tarjetas con iconos y enlaces
       cards: [
-        { title: "Categorias Empresas", value: "3", icon: "bi bi-shop-window", link: "/categorias-empresas" },
-        { title: "Usuarios", value: "21", icon: "bi bi-person-fill", link: "/usuarios" },
+        { title: "Empresas", value: "18", icon: "bi bi-cash", link: "/empresas" },
+        { title: "Usuarios", value: "16", icon: "bi bi-people", link: "/usuarios" },
       ],
 
-      //Datos para el grafico de lineas (Usuarios por mes)
       lineChartData: {
         labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
         datasets: [
           {
-            labels: 'Usuarios por mes',
+            label: 'Empresas',
             borderColor: '#FF6384',
-            data: [1, 2, 4, 5, 8],
+            data: [1, 3, 4, 8, 2],
             fill: false,
           }
         ],
       },
+
       lineChartOptions: {
         responsive: true,
         plugins: {
@@ -97,19 +101,20 @@ export default {
             position: 'top',
           },
         },
+        maintainAspectRatio: false,
       },
 
-      //Datos para el grafico de pastel (Tipos de Usuarios)
       pieChartData: {
-        labels: ['Cajero', 'Administrador', 'Gerente'],
+        labels: ['Gerentes', 'Cajero', 'Administrador'],
         datasets: [
           {
-            data: [21, 7, 3],
+            data: [9, 12, 2],
             backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
             hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          },
+          }
         ],
       },
+
       pieChartOptions: {
         responsive: true,
         plugins: {
@@ -117,16 +122,28 @@ export default {
             position: 'top',
           },
         },
+        maintainAspectRatio: false,
       },
-      //Datos para la tabla de Categorias Empresas recientemente registrados
-      sales: [
-        { nombre: 'CategoriaEmpresa #1', descripcion: 'descripcion #1' },
-        { nombre: 'CategoriaEmpresa #2', descripcion: 'descripcion #2' },
-        { nombre: 'CategoriaEmpresa #3', descripcion: 'descripcion #3' },
+
+      empresas: [
+        {
+          nombre: 'Libreria Coello',
+          ciudad: 'San Pedro Sula',
+          telefono: '555 57 67',
+          direccion: 'calle 27 # 40 - 36',
+          correo: 'ejemplocorreo',
+        },
+        {
+          nombre: 'Panaderia y Reposteria Las Espigas',
+          ciudad: 'San Pedro Sula',
+          telefono: '504 22 33 44',
+          direccion: 'avenida 10, zona norte',
+          correo: 'norte@empresa.com',
+        },
       ],
     };
   },
-};
+});
 </script>
 
 <style scoped>
@@ -204,7 +221,8 @@ export default {
 
 .line-chart,
 .pie-chart {
-  width: 30%;
+  width: 100%;
+  height: 300px;
 }
 
 /* Estilo para la tabla de ventas */

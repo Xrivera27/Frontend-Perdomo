@@ -7,47 +7,7 @@
   <hr>
 
   <div class="dashboard">
-    <div v-if="role === 1">
-      <!-- Secciones visibles solo para Administrador -->
-      <BarChartList />
-      <div class="box">
-        <div class="box-header"></div>
-        <!-- Contenido de gestión de usuarios -->
-      </div>
-    </div>
-
-    <div v-if="role === 2">
-      <!-- Secciones visibles solo para Gerente -->
-      <h3>Panel de Gerente</h3>
-      <BarChart />
-      <div class="box">
-        <div class="box-header">
-          <h3>Gestión de Inventario</h3>
-        </div>
-        <!-- Contenido de gestión de inventario -->
-        <p>Aquí puedes gestionar el inventario y visualizar reportes.</p>
-      </div>
-      <div class="box">
-        <div class="box-header">
-          <h3>Reportes de Ventas</h3>
-        </div>
-        <!-- Contenido de reportes de ventas -->
-        <p>Aquí puedes ver los reportes de ventas.</p>
-      </div>
-    </div>
-
-    <div v-if="role === 3">
-      <!-- Secciones visibles solo para Cajero -->
-      <h3>Panel de Cajero</h3>
-      <BarChart />
-      <div class="box">
-        <div class="box-header">
-          <h3>Registro de Ventas</h3>
-        </div>
-        <!-- Contenido de ventas -->
-        <p>Aquí puedes registrar las ventas y emitir facturas.</p>
-      </div>
-    </div>
+    <BarChartList />
   </div>
 </template>
 <script>
@@ -59,11 +19,6 @@
       ProfileButton,
       BarChartList,
     },
-    data() {
-      return {
-        role: Number(localStorage.getItem('role')) || 0
-      };
-    }
   }
 </script>
 

@@ -37,10 +37,9 @@
             <th>Apellido</th>
             <th>Nombre Usuario</th>
             <th>Contraseña</th>
-            <th>Email</th>
-            <th>Rol</th>
+            <th>Correo</th>
             <th>Telefono</th>
-            <th>Estado</th>
+            <th>Direccion</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -51,10 +50,9 @@
             <td>{{ empleado.apellido }}</td>
             <td>{{ empleado.nombreusuario }}</td>
             <td>{{ empleado.contraseña }}</td>
-            <td>{{ empleado.email }}</td>
-            <td>{{ empleado.rol }}</td>
+            <td>{{ empleado.correo }}</td>
             <td>{{ empleado.telefono }}</td>
-            <td>{{ empleado.estado }}</td>
+            <td>{{ empleado.direccion }}</td>
             <td>
               <button id="btnEditar" class="btn btn-warning" @click="editEmpleado(index)"><i
                   class="bi bi-pencil-fill"></i></button>
@@ -82,9 +80,15 @@
         </div>
 
         <div class="form-group">
-          <label>Usuario:</label>
+          <label>Nombre de Usuario:</label>
           <input v-model="empleadoForm.nombreusuario" type="text" required>
         </div>
+
+        <div class="form-group">
+          <label>Correo:</label>
+          <input v-model="empleadoForm.correo" type="text" required>
+        </div>
+
 
         <div class="form-group password-group">
           <label>Contraseña:</label>
@@ -95,18 +99,13 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Email:</label>
-          <input v-model="empleadoForm.email" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label>Rol:</label>
-          <select v-model="empleadoForm.rol" required style="width: 30%; height: 35px; font-size: 16px; padding: 5px;">
-            <option value="Administrador">Administrador</option>
-            <option value="Cajero">Cajero</option>
-            <option value="Gerente">Gerente</option>
-          </select>
+        <div class="form-group password-group">
+          <label>Confirmar Contraseña:</label>
+          <div class="password-wrapper">
+            <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
+            <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
+              @click="togglePasswordVisibility"></i>
+          </div>
         </div>
 
         <div id="form-tel" class="form-group">
@@ -114,13 +113,14 @@
           <input v-model="empleadoForm.telefono" type="text" required>
         </div>
 
-        <div class="form-group">
-          <label>Estado:</label>
-          <select v-model="empleadoForm.estado" required
-            style="width: 30%; height: 35px; font-size: 16px; padding: 5px;">
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
+        <div id="form-direc" class="form-group">
+          <label>Direccion:</label>
+          <input v-model="empleadoForm.direccion" type="text" required>
+        </div>
+
+        <div id="form-idenSucursal" class="form-group">
+          <label>Identificacion unico de Sucursal:</label>
+          <input v-model="empleadoForm.identificarSucursal" type="text" required>
         </div>
 
         <button id="AddEmpleadoModal" class="btn btn-primary" @click="guardarEmpleado">
@@ -151,23 +151,15 @@ export default {
         apellido: '',
         nombreusuario: '',
         contraseña: '',
-        email: '',
-        rol: '',
+        correo: '',
         telefono: '',
-        estado: '',
+        direccion: '',
+        identificarSucursal: '',
       },
       empleados: [
-        { nombre: 'Juan', apellido: 'Villegas', nombreusuario: 'Juvil', contraseña: '*****', email: 'junavillega@gmail.com', rol: 'Cajero', telefono: '9875875875', estado: 'Activo' },
-        { nombre: 'María', apellido: 'Pérez', nombreusuario: 'Maper', contraseña: '*****', email: 'mariaperez@gmail.com', rol: 'Cajero', telefono: '9876543210', estado: 'Activo' },
-        { nombre: 'Carlos', apellido: 'Ramírez', nombreusuario: 'Cram', contraseña: '*****', email: 'carlosramirez@gmail.com', rol: 'Cajero', telefono: '9876543211', estado: 'Activo' },
-        { nombre: 'Ana', apellido: 'Gómez', nombreusuario: 'Anago', contraseña: '*****', email: 'anagomez@gmail.com', rol: 'Cajero', telefono: '9876543212', estado: 'Activo' },
-        { nombre: 'Luis', apellido: 'Fernández', nombreusuario: 'Lufe', contraseña: '*****', email: 'luisfernandez@gmail.com', rol: 'Cajero', telefono: '9876543213', estado: 'Activo' },
-        { nombre: 'Pedro', apellido: 'Sánchez', nombreusuario: 'Pesan', contraseña: '*****', email: 'pedrosanchez@gmail.com', rol: 'Cajero', telefono: '9876543214', estado: 'Activo' },
-        { nombre: 'Claudia', apellido: 'Rodríguez', nombreusuario: 'Clrod', contraseña: '*****', email: 'claudiarodriguez@gmail.com', rol: 'Cajero', telefono: '9876543215', estado: 'Activo' },
-        { nombre: 'Gabriel', apellido: 'López', nombreusuario: 'Galo', contraseña: '*****', email: 'gabriellopez@gmail.com', rol: 'Cajero', telefono: '9876543216', estado: 'Activo' },
-        { nombre: 'Julia', apellido: 'Castillo', nombreusuario: 'Jucas', contraseña: '*****', email: 'juliacastillo@gmail.com', rol: 'Cajero', telefono: '9876543217', estado: 'Activo' },
-        { nombre: 'Andrés', apellido: 'Ríos', nombreusuario: 'Andri', contraseña: '*****', email: 'andresrios@gmail.com', rol: 'Cajero', telefono: '9876543218', estado: 'Activo' },
-       
+        {nombre: 'Carlos', apellido: 'Sosa', nombreusuario: 'Ernest', contraseña: '********',correo: 'trabajososa@gmail.com', telefono: '99765432', direccion: 'Col. La Pradera'},
+        {nombre: 'Ada', apellido: 'Selina', nombreusuario: 'Selena', contraseña: '******',correo: 'adaselina@gmail.com', telefono: '97654321', direccion: 'Col. Pizzaty'},
+        {nombre: 'Leonel', apellido: 'Salinas', nombreusuario: 'Sol', contraseña: '*****',correo: 'leoslinas@gmail.com', telefono: '97896743', direccion: 'Col. Las Acacias'},
       ]
 
     };
@@ -204,10 +196,10 @@ export default {
         apellido: '',
         nombreusuario: '',
         contraseña: '',
-        email: '',
-        rol: '',
+        correo: '',
         telefono: '',
-        estado: '',
+        direccion: '',
+        identificarSucursal: '',
       };
       this.isEditing = false;
       this.editIndex = null;
@@ -241,6 +233,9 @@ export default {
 
 * {
   font-family: 'Montserrat', sans-serif;
+}
+h1 {
+  color: #d6b602;
 }
 
 .encabezado {
@@ -531,6 +526,10 @@ button {
 }
 
 #form-tel{
+  width: 30%;
+}
+
+#form-direc{
   width: 30%;
 }
 </style>

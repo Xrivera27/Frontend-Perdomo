@@ -1,6 +1,6 @@
 <template>
   <div class="encabezado">
-    <h1>Categorias:Empresas</h1>
+    <h1>Categorias de Empresas</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>

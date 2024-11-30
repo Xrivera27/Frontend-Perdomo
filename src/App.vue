@@ -1,6 +1,10 @@
 <template>
   <div class="app-wrapper">
-    <AppSideBar :expanded="expanded" @toggle-sidebar="toggleSidebar" @expand-sidebar="expandSidebar" @collapse-sidebar="collapseSidebar"/>
+    <AppSideBar :expanded="expanded"
+    :is-active="isActive" 
+    @toggle-sidebar="toggleSidebar" 
+    @expand-sidebar="expandSidebar" 
+    @collapse-sidebar="collapseSidebar"/>
 
     <main class="main-content" :class="{expanded}">
       <!-- Aquí se carga el contenido dinámico según la ruta -->
@@ -34,6 +38,17 @@ export default {
     async collapseSidebar() {
       this.expanded = false;
     },
+
+    isActive(route) {
+      return this.$route.path === route;
+    },
+
+    mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+    },
+    beforeUnmount() {
+    document.removeEventListener("click", this.handleClickOutside);
+    }
   },
 };
 </script>
@@ -62,12 +77,17 @@ a.nav-link {
   justify-content: center;
 }
 
+/*ul.nav {
+  padding: 0 15px;
+} */
+
 .main-content {
   margin-left: 80px;
   padding: 20px;
   width: 100%;
   transition: margin-left 0.3 ease, background-color 0.3s ease;
   background-color: #f5f5f5;
+  overflow-x: auto;
 }
 
 .main-content.expanded {
@@ -131,4 +151,8 @@ a.nav-link {
   background-color: #dadada;
 }
 
+.nav-link.active {
+  background-color: #d4d4d4;
+  color: #79552f;
+}
 </style>

@@ -11,33 +11,33 @@
     <ul class="nav flex-column">
 
       <!--Home-->
-      <li class="nav-item" :class="{active :isActive('/home')}">
-        <router-link to="/home" class="nav-link">
+      <li class="nav-item">
+        <router-link to="/home" class="nav-link" :class="{active :isActive('/home')}">
           <i class="bi bi-house-door-fill"></i>
           <span v-if="expanded" class="tooltip-text">Home</span>
         </router-link>
       </li>
 
       <!--Sucursales-->
-      <li class="nav-item" :class="{active :isActive('/empresas')}">
-        <router-link to="/empresas" class="nav-link">
+      <li class="nav-item">
+        <router-link to="/empresas" class="nav-link" :class="{active :isActive('/empresas')}">
           <i class="bi bi-shop-window"></i>
           <span v-if="expanded" class="tooltip-text">Empresas</span>
         </router-link>
       </li>
 
       <!--Usuario-->
-      <li class="nav-item" :class="{active :isActive('/usuarios')}">
-        <router-link to="/usuarios" class="nav-link">
+      <li class="nav-item">
+        <router-link to="/usuarios" class="nav-link" :class="{active :isActive('/usuarios')}">
           <i class="bi bi-person-fill"></i>
           <span v-if="expanded" class="tooltip-text">Usuarios</span>
         </router-link>
       </li>
       
       <!--Categorias-Empresas-->
-      <li class="nav-item" :class="{active :isActive('/categorias-empresas')}">
-        <router-link to="/categorias-empresas" class="nav-link">
-          <i class="bi bi-truck"></i>
+      <li class="nav-item" >
+        <router-link to="/categorias-empresas" class="nav-link" :class="{active :isActive('/categorias-empresas')}">
+          <i class="bi bi-building"></i>
           <span v-if="expanded" class="tooltip-text">Proveedores</span>
         </router-link>
       </li>
@@ -48,8 +48,8 @@
 
     <!--Configuracion-->
     <ul class="nav flex-column">
-      <li class="nav-item" :class="{active :isActive('/config-page')}">
-        <router-link to="/config-page" class="nav-link" >
+      <li class="nav-item" >
+        <router-link to="/config-page" class="nav-link" :class="{active :isActive('/config-page')}" >
           <i class="bi bi-gear-fill"></i>
           <span v-if="expanded" class="tooltip-text">Configuracion</span>
         </router-link>
@@ -74,12 +74,16 @@
 
 <script>
 export default {
-  name: "AppSidebar",
+  name: 'AppSidebar',
   props: {
     expanded: {
       type: Boolean,
       required: true,
     },
+    isActive: {
+      type: Function,
+      required: true,
+    }
   },
   methods: {
     toggleSidebar() {
@@ -267,7 +271,7 @@ a.nav-link {
   display: block;
 }
 
-.sidebar li.active {
+.nav-link.active {
   background-color: #d4d4d4; /* Color del sombreado */
   color: #79552f;
 }
