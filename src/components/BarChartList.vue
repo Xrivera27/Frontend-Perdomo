@@ -11,19 +11,7 @@
             <p class="item-value">{{ item.value }}</p>
           </div>
         </div>
-        <a href="item.link" class="card-link">Ver más</a>
-      </div>
-    </div>
-
-    <div class="graphics-container">
-      <!--Graficos de linea y de Pie-->
-      <div class="charts-container">
-        <div class="line-chart">
-          
-        </div>
-        <div class="pie-chart">
-
-        </div>
+        <a :href="item.link" class="card-link">Ver más</a>
       </div>
     </div>
 
@@ -78,10 +66,13 @@ export default defineComponent({
   data() {
     return {
       cards: [
-        { title: "Empresas", value: "18", icon: "bi bi-cash", link: "/empresas" },
-        { title: "Usuarios", value: "16", icon: "bi bi-people", link: "/usuarios" },
+        { title: "Empresas", value: "5", icon: "bi bi-bank", link: "/empresas" },
+        { title: "Usuarios", value: "6", icon: "bi bi-people", link: "/usuarios" },
+        { title: "Sucursales", value: "5", icon: "bi bi-shop-window", link: "/usuarios" },
+        { title: "Categorias Empresariales" , value: "3", icon: "bi bi-building", link: "/categorias_empresas"},
       ],
-
+      
+      // Datos para el gráfico de linea 
       lineChartData: {
         labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
         datasets: [
@@ -103,7 +94,8 @@ export default defineComponent({
         },
         maintainAspectRatio: false,
       },
-
+      
+      // Datos para el gráfico de pastel
       pieChartData: {
         labels: ['Gerentes', 'Cajero', 'Administrador'],
         datasets: [
@@ -139,6 +131,14 @@ export default defineComponent({
           telefono: '504 22 33 44',
           direccion: 'avenida 10, zona norte',
           correo: 'norte@empresa.com',
+        },
+
+        {
+          nombre: 'Ferreteria La Cumbre',
+          ciudad: 'La Ceiba',
+          telefono: '504 34 12 23',
+          direccion: 'avenida 12, zona central',
+          correo: 'Lacumbre@empresa.com',
         },
       ],
     };

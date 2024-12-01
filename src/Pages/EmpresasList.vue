@@ -1,6 +1,6 @@
 <template>
   <div class="encabezado">
-    <h1>Administracion Empresas</h1>
+    <h1>Administracion de Empresas</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>
@@ -138,6 +138,30 @@ export default {
           telefono: '504 22 33 44',
           direccion: 'avenida 10, zona norte',
           correo: 'norte@empresa.com',
+        },
+
+        {
+          nombre: 'Ferreteria La Cumbre',
+          ciudad: 'La Ceiba',
+          telefono: '504 34 12 23',
+          direccion: 'avenida 12, zona central',
+          correo: 'Lacumbre@empresa.com',
+        },
+
+        {
+          nombre: 'Textiles EL Caribe',
+          ciudad: 'La Ceiba',
+          telefono: '504 21 33  56 07',
+          direccion: 'Parque Central, 2da avenida',
+          correo: 'Lacumbre@empresa.com',
+        },
+
+        {
+          nombre: 'Carnitas del Pablo',
+          ciudad: 'La Ceiba',
+          telefono: '504 21 44 60 12',
+          direccion: 'Avenida San Isidro, cerca del Muelle Turistico Reynaldo Canales',
+          correo: 'Lacumbre@empresa.com',
         },
       ],
 

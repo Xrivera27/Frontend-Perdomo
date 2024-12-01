@@ -18,7 +18,7 @@
         </router-link>
       </li>
 
-      <!--Sucursales-->
+      <!--Empresas-->
       <li class="nav-item">
         <router-link to="/empresas" class="nav-link" :class="{active :isActive('/empresas')}">
           <i class="bi bi-shop-window"></i>
@@ -26,7 +26,7 @@
         </router-link>
       </li>
 
-      <!--Usuario-->
+      <!--Usuarios-->
       <li class="nav-item">
         <router-link to="/usuarios" class="nav-link" :class="{active :isActive('/usuarios')}">
           <i class="bi bi-person-fill"></i>
@@ -34,7 +34,7 @@
         </router-link>
       </li>
       
-      <!--Categorias-Empresas-->
+      <!--Categorias Empresas-->
       <li class="nav-item" >
         <router-link to="/categorias-empresas" class="nav-link" :class="{active :isActive('/categorias-empresas')}">
           <i class="bi bi-building"></i>

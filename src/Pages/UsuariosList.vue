@@ -166,6 +166,9 @@ export default {
         { nombre: 'Carlos', apellido: 'Sosa', nombreusuario: 'Ernest', contraseña: '********', correo: 'trabajososa@gmail.com', telefono: '99765432', direccion: 'Col. La Pradera' },
         { nombre: 'Ada', apellido: 'Selina', nombreusuario: 'Selena', contraseña: '******', correo: 'adaselina@gmail.com', telefono: '97654321', direccion: 'Col. Pizzaty' },
         { nombre: 'Leonel', apellido: 'Salinas', nombreusuario: 'Sol', contraseña: '*****', correo: 'leoslinas@gmail.com', telefono: '97896743', direccion: 'Col. Las Acacias' },
+        { nombre: 'Byron', apellido: 'Callejas', nombreusuario: 'Ben', contraseña: '*********', correo: 'byroncalle@gmail.com', telefono: '98712345', direccion: 'Col. La Pradera' },
+        { nombre: 'Lily', apellido: 'Sanchez', nombreusuario: 'Lilly', contraseña: '*********', correo: 'lilysan@gmail.com', telefono: '99894412', direccion: 'Col. Miramar' },
+        { nombre: 'Evagelina', apellido: 'Andes', nombreusuario: 'EvaAndes', contraseña: '********', correo: 'evagenlina@gmail.com', telefono: '97118967', direccion: 'Col. Sierra Pina' },
       ]
 
     };
