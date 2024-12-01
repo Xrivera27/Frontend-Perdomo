@@ -18,21 +18,27 @@
     <table class="sales-table">
       <thead>
         <tr>
-          <th>Nombre</th>
-          <th>Ciudad</th>
+          <th>#</th>
+          <th>Nombre Empresa</th>
+          <th>RTN</th>
           <th>Telefono</th>
-          <th>Direccion</th>
           <th>Correo</th>
+          <th>Nombre de CEO</th>
+          <th>Correo CEO</th>
+          <th>Telefono CEO</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(empresa, index) in empresas" :key="index">
+          <td>{{ index + 1 }}</td>
           <td>{{ empresa.nombre }}</td>
-          <td>{{ empresa.ciudad }}</td>
+          <td>{{ empresa.rtn }}</td>
           <td>{{ empresa.telefono }}</td>
-          <td>{{ empresa.direccion }}</td>
           <td>{{ empresa.correo }}</td>
+          <td>{{ empresa.nombreCEO }}</td>
+          <td>{{ empresa.correoCEO }}</td>
+          <td>{{ empresa.telefonoCEO }}</td>
           <td><a href="#">Ver más</a><span>|</span><button style="font-size: 1rem;">Descargar</button></td>
         </tr>
       </tbody>
@@ -120,25 +126,32 @@ export default defineComponent({
       empresas: [
         {
           nombre: 'Libreria Coello',
-          ciudad: 'San Pedro Sula',
+          rtn: '05678901234',
           telefono: '555 57 67',
-          direccion: 'calle 27 # 40 - 36',
           correo: 'ejemplocorreo',
+          nombreCEO: 'Lenny Coello',
+          correoCEO: 'lennyCoello@gmail.com',
+          telefonoCEO: '99674211',
         },
         {
           nombre: 'Panaderia y Reposteria Las Espigas',
-          ciudad: 'San Pedro Sula',
+          rtn: '01345566239',
           telefono: '504 22 33 44',
-          direccion: 'avenida 10, zona norte',
           correo: 'norte@empresa.com',
+          nombreCEO: 'Mildred Montana',
+          correoCEO: 'MontanaMildred@gmail.com',
+          telefonoCEO: '99086750',
         },
 
         {
           nombre: 'Ferreteria La Cumbre',
-          ciudad: 'La Ceiba',
+          rtn: '02431133567',
           telefono: '504 34 12 23',
           direccion: 'avenida 12, zona central',
           correo: 'Lacumbre@empresa.com',
+          nombreCEO: 'Juan Molina',
+          correoCEO: 'JuanMolina@gmail.com',
+          telefonoCEO: '99567834',
         },
       ],
     };

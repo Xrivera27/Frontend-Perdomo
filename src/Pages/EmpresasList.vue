@@ -34,7 +34,8 @@
           <tr>
             <th>#</th>
             <th>Nombre</th>
-            <th>Ciudad</th>
+            <th>RTN</th>
+            <th>Categoria de Empresa</th>
             <th>Telefono</th>
             <th>Direccion</th>
             <th>Correo</th>
@@ -45,7 +46,8 @@
           <tr v-for="(empresa,index) in paginatedEmpresas" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ empresa.nombre }}</td>
-            <td>{{ empresa.ciudad }}</td>
+            <td>{{ empresa.rtn }}</td>
+            <td>{{ empresa.categoriaEmpresa }}</td>
             <td>{{ empresa.telefono }}</td>
             <td>{{ empresa.direccion }}</td>
             <td>{{ empresa.correo }}</td>
@@ -79,8 +81,18 @@
         </div>
 
         <div class="form-group">
+          <label>RTN:</label>
+          <input v-model="empresaForm.rtn" type="text" required>
+        </div>
+
+        <div class="form-group">
           <label>Telefono:</label>
           <input v-model="empresaForm.telefono" type="text" required>
+        </div>
+
+        <div class="form-group">
+          <label>Categoria Empresa:</label>
+          <input v-model="empresaForm.categoriaEmpresa" type="text" required>
         </div>
 
         <div class="form-group">
@@ -118,50 +130,56 @@ export default {
       editIndex: null,
       empresaForm: {
         nombre: '',
-        ciudad: '',
+        rtn: '',
         telefono: '',
         direccion: '',
         correo: '',
+        categoriaEmpresa: '',
       },
 
       empresas: [
         {
           nombre: 'Libreria Coello',
-          ciudad: 'San Pedro Sula',
+          rtn: '05678901234',
           telefono: '555 57 67',
           direccion: 'calle 27 # 40 - 36',
-          correo: 'ejemplocorreo',
+          correo: 'libreriaCoello@gmail.com',
+          categoriaEmpresa : 'CategoriaEmpresa#1',
         },
         {
           nombre: 'Panaderia y Reposteria Las Espigas',
-          ciudad: 'San Pedro Sula',
+          rtn: '01345566239',
           telefono: '504 22 33 44',
           direccion: 'avenida 10, zona norte',
-          correo: 'norte@empresa.com',
+          correo: 'panaderiaEspigas@gmail.com',
+          categoriaEmpresa : 'CategoriaEmpresa#2',
         },
 
         {
           nombre: 'Ferreteria La Cumbre',
-          ciudad: 'La Ceiba',
+          rtn: '02431133567',
           telefono: '504 34 12 23',
           direccion: 'avenida 12, zona central',
-          correo: 'Lacumbre@empresa.com',
+          correo: 'Lacumbre@gmail.com',
+          categoriaEmpresa : 'CategoriaEmpresa#2',
         },
 
         {
           nombre: 'Textiles EL Caribe',
-          ciudad: 'La Ceiba',
+          rtn: '09761324564',
           telefono: '504 21 33  56 07',
           direccion: 'Parque Central, 2da avenida',
-          correo: 'Lacumbre@empresa.com',
+          correo: 'textileCeiba@gmail.com',
+          categoriaEmpresa : 'CategoriaEmpresa#3',
         },
 
         {
           nombre: 'Carnitas del Pablo',
-          ciudad: 'La Ceiba',
+          rtn: '08675412223',
           telefono: '504 21 44 60 12',
           direccion: 'Avenida San Isidro, cerca del Muelle Turistico Reynaldo Canales',
-          correo: 'Lacumbre@empresa.com',
+          correo: 'CarnitasPablo@gmail.com',
+          categoriaEmpresa : 'CategoriaEmpresa#1',
         },
       ],
 
