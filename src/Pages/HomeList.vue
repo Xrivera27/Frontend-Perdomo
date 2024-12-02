@@ -1,7 +1,7 @@
 
 <template>
   <div class="encabezado">
-    <h1>Bienvenido , Perdomo</h1>
+    <h1>Bienvenido Perdomo y Asociados</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>

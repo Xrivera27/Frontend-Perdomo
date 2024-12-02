@@ -7,8 +7,9 @@
 
   <div class="empleados-wrapper">
     <div class="opciones">
-      <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">Agregar
-        Usuario</button>
+      <button id="btnAdd" class="btn btn-primary" @click="openModal">
+        Agregar Usuario
+      </button>
 
       <div class="registros">
         <span>Mostrar
@@ -23,11 +24,16 @@
         </span>
       </div>
 
-      <!-- Barra de búsqueda -->
       <div class="search-bar">
-        <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empleado..." />
+        <input 
+          class="busqueda" 
+          type="text" 
+          v-model="searchQuery" 
+          placeholder="Buscar empleado..." 
+        />
       </div>
     </div>
+
     <div class="table-container">
       <table class="table">
         <thead>
@@ -38,26 +44,28 @@
             <th>Nombre Usuario</th>
             <th>Contraseña</th>
             <th>Correo</th>
-            <th>Telefono</th>
-            <th>Direccion</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(empleado, index) in paginatedEmpleados" :key="index">
+          <tr v-for="(empleado, index) in paginatedEmpleados" :key="empleado.id_usuario">
             <td>{{ index + 1 }}</td>
             <td>{{ empleado.nombre }}</td>
             <td>{{ empleado.apellido }}</td>
-            <td>{{ empleado.nombreusuario }}</td>
+            <td>{{ empleado.nombre_usuario }}</td>
             <td>{{ empleado.contraseña }}</td>
             <td>{{ empleado.correo }}</td>
             <td>{{ empleado.telefono }}</td>
             <td>{{ empleado.direccion }}</td>
             <td>
-              <button id="btnEditar" class="btn btn-warning" @click="editEmpleado(index)"><i
-                  class="bi bi-pencil-fill"></i></button>
-              <button id="btnEliminar" class="btn btn-danger" @click="deleteEmpleado(index)"><b><i
-                    class="bi bi-x-lg"></i></b></button>
+              <button class="btn btn-warning" @click="editEmpleado(empleado)">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button class="btn btn-danger" @click="desactivarEmpleado(empleado.id_usuario)">
+                <i class="bi bi-x-lg"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -67,28 +75,46 @@
     <!-- Modal para agregar o editar empleados -->
     <div v-if="isModalOpen" class="modal">
       <div class="modal-content">
-        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Empleado' : 'Agregar Empleado' }}</h2>
+        <h2 class="h2-modal-content">
+          {{ isEditing ? 'Editar Empleado' : 'Agregar Empleado' }}
+        </h2>
 
         <div class="contenedor-principal">
           <div class="contenedor contenedor-izquierdo">
             <div class="form-group">
               <label>Nombre:</label>
-              <input v-model="empleadoForm.nombre" type="text" required>
+              <input 
+                v-model="empleadoForm.nombre" 
+                type="text" 
+                required
+              >
             </div>
 
             <div class="form-group">
               <label>Apellido:</label>
-              <input v-model="empleadoForm.apellido" type="text" required>
+              <input 
+                v-model="empleadoForm.apellido" 
+                type="text" 
+                required
+              >
             </div>
 
             <div class="form-group">
               <label>Nombre de Usuario:</label>
-              <input v-model="empleadoForm.nombreusuario" type="text" required>
+              <input 
+                v-model="empleadoForm.nombre_usuario" 
+                type="text" 
+                required
+              >
             </div>
 
             <div class="form-group">
               <label>Correo:</label>
-              <input v-model="empleadoForm.correo" type="text" required>
+              <input 
+                v-model="empleadoForm.correo" 
+                type="email" 
+                required
+              >
             </div>
           </div>
 
@@ -96,43 +122,60 @@
             <div class="form-group password-group">
               <label>Contraseña:</label>
               <div class="password-wrapper">
-                <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
-                <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
-                  @click="togglePasswordVisibility"></i>
+                <input 
+                  :type="showPassword ? 'text' : 'password'" 
+                  v-model="empleadoForm.contraseña" 
+                  required
+                />
+                <i 
+                  :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" 
+                  class="toggle-password"
+                  @click="togglePasswordVisibility"
+                ></i>
               </div>
             </div>
 
-            <div class="form-group password-group">
-              <label>Confirmar Contraseña:</label>
-              <div class="password-wrapper">
-                <input :type="showPassword ? 'text' : 'password'" v-model="password" required />
-                <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'" class="toggle-password"
-                  @click="togglePasswordVisibility"></i>
-              </div>
+            <div class="form-group">
+              <label>Teléfono:</label>
+              <input 
+                v-model="empleadoForm.telefono" 
+                type="text" 
+                required
+              >
             </div>
 
-            <div id="form-tel" class="form-group">
-              <label>Telefono:</label>
-              <input v-model="empleadoForm.telefono" type="text" required>
+            <div class="form-group">
+              <label>Dirección:</label>
+              <input 
+                v-model="empleadoForm.direccion" 
+                type="text" 
+                required
+              >
             </div>
 
-            <div id="form-direc" class="form-group">
-              <label>Direccion:</label>
-              <input v-model="empleadoForm.direccion" type="text" required>
-            </div>
-
-            <div id="form-idenSucursal" class="form-group">
-              <label>Identificacion de Sucursal:</label>
-              <input v-model="empleadoForm.identificarSucursal" type="text" required>
+            <div class="form-group">
+              <label>Identificación de Sucursal:</label>
+              <input 
+                v-model="empleadoForm.id_sucursal" 
+                type="number" 
+                required
+              >
             </div>
           </div>
         </div>
-        <!--Boton de Guardar y cerrar-->
-        <button id="AddEmpleadoModal" class="btn btn-primary" @click="guardarEmpleado">
+
+        <button 
+          class="btn btn-primary" 
+          @click="guardarEmpleado"
+        >
           {{ isEditing ? 'Guardar Cambios' : 'Agregar Empleado' }}
         </button>
-        <button id="BtnCerrar" class="btn btn-secondary" @click="closeModal">Cerrar</button>
-
+        <button 
+          class="btn btn-secondary" 
+          @click="closeModal"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
@@ -140,99 +183,128 @@
 
 <script>
 import ProfileButton from '../components/ProfileButton.vue';
+import solicitudes from '../../services/Solicitudes';
+
 export default {
   components: {
     ProfileButton
   },
+
   data() {
     return {
-      searchQuery: '', // Almacena el texto de búsqueda
+      searchQuery: '',
       isModalOpen: false,
       isEditing: false,
       showPassword: false,
-      editIndex: null,
       itemsPerPage: "",
       empleadoForm: {
         nombre: '',
         apellido: '',
-        nombreusuario: '',
+        nombre_usuario: '',
         contraseña: '',
         correo: '',
         telefono: '',
         direccion: '',
-        identificarSucursal: '',
+        id_sucursal: ''
       },
-      empleados: [
-        { nombre: 'Carlos', apellido: 'Sosa', nombreusuario: 'Ernest', contraseña: '********', correo: 'trabajososa@gmail.com', telefono: '99765432', direccion: 'Col. La Pradera' },
-        { nombre: 'Ada', apellido: 'Selina', nombreusuario: 'Selena', contraseña: '******', correo: 'adaselina@gmail.com', telefono: '97654321', direccion: 'Col. Pizzaty' },
-        { nombre: 'Leonel', apellido: 'Salinas', nombreusuario: 'Sol', contraseña: '*****', correo: 'leoslinas@gmail.com', telefono: '97896743', direccion: 'Col. Las Acacias' },
-        { nombre: 'Byron', apellido: 'Callejas', nombreusuario: 'Ben', contraseña: '*********', correo: 'byroncalle@gmail.com', telefono: '98712345', direccion: 'Col. La Pradera' },
-        { nombre: 'Lily', apellido: 'Sanchez', nombreusuario: 'Lilly', contraseña: '*********', correo: 'lilysan@gmail.com', telefono: '99894412', direccion: 'Col. Miramar' },
-        { nombre: 'Evagelina', apellido: 'Andes', nombreusuario: 'EvaAndes', contraseña: '********', correo: 'evagenlina@gmail.com', telefono: '97118967', direccion: 'Col. Sierra Pina' },
-      ]
-
+      empleados: []
     };
   },
+
   computed: {
     filteredEmpleados() {
-      // Filtra los empleados basados en el texto de búsqueda
       return this.empleados.filter(empleado =>
         empleado.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         empleado.apellido.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        empleado.nombreusuario.toLowerCase().includes(this.searchQuery.toLowerCase())
+        empleado.nombre_usuario.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
+
     paginatedEmpleados() {
-      // Si itemsPerPage es vacío, mostramos todos los registros, de lo contrario aplicamos la paginación
       if (this.itemsPerPage === "" || this.itemsPerPage === null) {
         return this.filteredEmpleados;
-      } else {
-        return this.filteredEmpleados.slice(0, parseInt(this.itemsPerPage));
       }
+      return this.filteredEmpleados.slice(0, parseInt(this.itemsPerPage));
     }
   },
+
   methods: {
+    async loadEmpleados() {
+      try {
+        this.empleados = await solicitudes.fetchUsuarios();
+      } catch (error) {
+        console.error('Error al cargar empleados:', error);
+        // Aquí podrías agregar una notificación de error
+      }
+    },
+
     openModal() {
       this.isModalOpen = true;
+      this.isEditing = false;
+      this.clearForm();
     },
+
     closeModal() {
       this.isModalOpen = false;
       this.clearForm();
     },
+
     clearForm() {
       this.empleadoForm = {
         nombre: '',
         apellido: '',
-        nombreusuario: '',
+        nombre_usuario: '',
         contraseña: '',
         correo: '',
         telefono: '',
         direccion: '',
-        identificarSucursal: '',
+        id_sucursal: ''
       };
-      this.isEditing = false;
-      this.editIndex = null;
     },
-    guardarEmpleado() {
-      if (this.isEditing) {
-        this.empleados[this.editIndex] = { ...this.empleadoForm };
-      } else {
-        this.empleados.push({ ...this.empleadoForm });
+
+    async guardarEmpleado() {
+      try {
+        if (this.isEditing) {
+          await solicitudes.actualizarUsuario(this.empleadoForm.id_usuario, this.empleadoForm);
+        } else {
+          await solicitudes.crearUsuario(this.empleadoForm);
+        }
+        
+        this.closeModal();
+        await this.loadEmpleados();
+        // Aquí podrías agregar una notificación de éxito
+      } catch (error) {
+        console.error('Error al guardar empleado:', error);
+        // Aquí podrías agregar una notificación de error
       }
-      this.closeModal();
     },
-    editEmpleado(index) {
-      this.empleadoForm = { ...this.empleados[index] };
+
+    editEmpleado(empleado) {
       this.isEditing = true;
-      this.editIndex = index;
-      this.openModal();
+      this.empleadoForm = { ...empleado };
+      this.isModalOpen = true;
     },
-    deleteEmpleado(index) {
-      this.empleados.splice(index, 1);
+
+    async desactivarEmpleado(id_usuario) {
+      if (confirm('¿Está seguro de desactivar este usuario?')) {
+        try {
+          await solicitudes.desactivarUsuario(id_usuario, false);
+          await this.loadEmpleados();
+          // Aquí podrías agregar una notificación de éxito
+        } catch (error) {
+          console.error('Error al desactivar empleado:', error);
+          // Aquí podrías agregar una notificación de error
+        }
+      }
     },
+
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
-    },
+    }
+  },
+
+  mounted() {
+    this.loadEmpleados();
   }
 };
 </script>
@@ -257,6 +329,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .busqueda {
@@ -265,6 +338,7 @@ h1 {
   font-size: 14px;
   border-radius: 10px;
   border-width: 0.5px;
+  width: 200px;
 }
 
 .registros {
@@ -282,40 +356,27 @@ h1 {
   font-weight: bold;
 }
 
-.export-button {
-  margin: 0;
-}
-
-.opciones {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.h2-modal-content {
-  margin-top: 0px
-}
-
 #btnAdd:hover {
   background-color: #a38655;
   transform: scale(1.05);
   transition: all 0.3s ease;
 }
 
-#btnEditar {
+.btn-warning {
   font-size: 18px;
   width: 50px;
   height: 40px;
   border-radius: 10px;
+  margin-right: 5px;
 }
 
-#btnEditar:hover {
+.btn-warning:hover {
   background-color: #e8af06;
   transform: scale(1.05);
   transition: all 0.3s ease;
 }
 
-#btnEliminar {
+.btn-danger {
   font-size: 18px;
   width: 50px;
   height: 40px;
@@ -323,36 +384,10 @@ h1 {
   color: black;
 }
 
-#btnEliminar:hover {
+.btn-danger:hover {
   background-color: #b72433;
   transform: scale(1.05);
   transition: all 0.3s ease;
-}
-
-#campana {
-  margin-right: 10px;
-  font-size: 18px;
-  color: #a38655;
-}
-
-.container-top {
-  width: 100%;
-  text-align: right;
-}
-
-.rol {
-  color: #969696;
-  font-size: 14px;
-}
-
-select {
-  border: 1px solid #ccc;
-  margin-top: 10px;
-  margin-left: 5px;
-  margin-right: 5px;
-  width: 60px;
-  height: 35px;
-  border-radius: 5px;
 }
 
 .empleados-wrapper {
@@ -364,7 +399,6 @@ select {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid #ddd;
-  margin-top: 16px;
 }
 
 .table {
@@ -376,50 +410,12 @@ select {
 .table th,
 .table td {
   padding: 8px;
+  text-align: center;
 }
 
 .table thead th {
-  background-color: none;
-  text-align: center;
+  background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
-}
-
-.table tbody td {
-  text-align: center;
-  border-top: 1px solid #ddd;
-}
-
-.table thead th:first-child {
-  border-top-left-radius: 10px;
-}
-
-.table thead th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-}
-
-.btn {
-  padding: 8px 16px;
-  margin: 4px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-warning {
-  background-color: #ffc107;
-  color: black;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
 }
 
 .modal {
@@ -434,122 +430,74 @@ select {
   align-items: center;
 }
 
-#AddEmpleadoModal {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: black;
-  background-color: #c09d62;
-  cursor: pointer;
-  margin-right: 1rem;
-}
-
-#BtnCerrar {
-  background-color: rgb(93, 100, 104);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  margin-right: 1rem;
-}
-
 .modal-content {
   background-color: white;
   padding: 20px;
-  border-radius: 4px;
-  max-width: 500px;
-  width: 100%;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
 }
 
 .contenedor-principal {
   display: flex;
-  width: 100%;
-  justify-content: space-around;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .contenedor {
-  width: 45%;
+  flex: 1;
 }
 
 .form-group {
-  margin-bottom: 16px;
-
+  margin-bottom: 15px;
 }
 
 .form-group label {
-  display: flexbox;
-  margin-bottom: 8px;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
 }
 
 .form-group input {
-  width: 95%;
-  height: 25%;
-  padding: 0.5rem;
+  width: 100%;
+  padding: 8px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  justify-content: center;
-}
-
-button {
-  cursor: pointer;
-}
-
-.custom-select {
-  border: 1px solid #ccc;
   border-radius: 5px;
-  height: 35px;
-  font-size: 16px;
-  padding: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  width: 80px;
-  /* Ajusta el ancho a 120px o el valor que prefieras */
-}
-
-.custom-select:focus {
-  outline: none;
-  border-color: #a38655;
-  /* Ajusta el color del borde al de tu diseño */
-}
-
-.custom-select option {
-  font-size: 16px;
 }
 
 .password-wrapper {
   position: relative;
 }
 
-.password-wrapper input {
-  width: 95%;
-  height: 25%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  justify-content: center;
-}
-
 .password-wrapper .toggle-password {
   position: absolute;
-  right: 1.3rem;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #aaa;
 }
 
-.password-wrapper .toggle-password:hover {
-  color: #000;
+.custom-select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
-#form-tel {
-  width: 95%;
+button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-#form-direc {
-  width: 95%;
+.btn-primary {
+  background-color: #c09d62;
+  color: black;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
 }
 </style>

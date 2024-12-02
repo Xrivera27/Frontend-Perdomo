@@ -11,167 +11,287 @@
         Agregar Categoria
       </button>
 
-      <div class="registros">
-        <span>Mostrar
-          <select v-model="itemsPerPage" class="custom-select">
-            <option value="">Todos</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="25">25</option>
-          </select> registros
-        </span>
-      </div>
+      <ExportButton :columns="columns" :rows="rows" fileName="Categorias.pdf" class="export-button"/>
 
-      <!-- Barra de búsqueda -->
       <div class="search-bar">
         <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar categoria..." />
       </div>
     </div>
 
-      <div class="table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Descripcion</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
+    <!-- Loading indicator -->
+    <div v-if="loading" class="loading-container">
+      <span>Cargando categorías...</span>
+    </div>
 
-          <tbody>
-            <tr v-for="(categoria,index) in paginatedCategorias" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ categoria.nombre }}</td>
-              <td>{{ categoria.descripcion }}</td>
-              <td>
-                <button id="btnEditar" class="btn btn-warning" @click="editCategoria(index)">
-                  <i class="bi bi-pencil-fill"></i>
-                </button>
+    <!-- Error message -->
+    <div v-else-if="error" class="error-container">
+      <span>{{ error }}</span>
+    </div>
 
-                <button id="btnEliminar" class="btn btn-danger" @click="deleteCategorias(index)">
-                  <b><i class="bi bi-x-lg"></i></b>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div v-else class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Categoria</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-      <!-- Modal para agregar y editar categorias-->
-       <div v-if="isModalOpen" class="modal">
-        <div class="modal-content">
-          <h2 class="h2-modal-content">{{ isEditing ? 'Editar Categoria' :'Agregar Categoria' }}</h2>
+        <tbody>
+          <tr v-for="(categoria, index) in paginatedCategorias" :key="categoria.id_categoria">
+            <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
+            <td>{{ categoria.categoria }}</td>
+            <td>{{ categoria.descripcion }}</td>
+            <td>
+              <button id="btnEditar" class="btn btn-warning" @click="editCategoria(categoria)">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button id="btnEliminar" class="btn btn-danger" @click="showDeleteConfirm(categoria.id_categoria)">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </td>
+          </tr>
+          <tr v-if="paginatedCategorias.length === 0">
+            <td colspan="4" class="text-center">No hay categorías disponibles</td>
+          </tr>
+        </tbody>
+      </table>
 
-          <div class="form-group">
-            <label>Nombre:</label>
-            <input v-model="categoriaForm.nombre" type="text" required>
-          </div>
-
-          <div class="form-group">
-            <label>Descripcion:</label>
-            <input v-model="categoriaForm.descripcion" type="text" required>
-          </div>
-
-          <button id="AddCategoriaModal" class="btn btn-primary" @click="guardarCategoria">
-            {{ isEditing ? 'Guardar cambios': 'Agregar Categoria' }}
+      <!-- Paginación -->
+      <div class="pagination-wrapper">
+        <div class="pagination-info">
+          Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, filteredCategorias.length) }} de {{ filteredCategorias.length }} registros
+        </div>
+        <div class="pagination-container">
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === 1"
+            @click="previousPage"
+          >
+            Anterior
           </button>
-
-          <button id="btnCerrar" class="btn btn-secundary" @click="closeModal">Cerrar</button>
+          
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === totalPages"
+            @click="nextPage"
+          >
+            Siguiente
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- Modal para agregar y editar categorias -->
+    <div v-if="showModal" class="modal">
+      <div class="modal-content">
+        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Categoria' : 'Agregar Categoria' }}</h2>
+        
+        <form @submit.prevent="guardarCategoria">
+          <div class="form-group">
+            <label>Categoria:</label>
+            <input 
+              v-model="categoriaForm.categoria" 
+              type="text" 
+              required
+              placeholder="Ingrese el nombre de la categoría"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Descripción:</label>
+            <input 
+              v-model="categoriaForm.descripcion" 
+              type="text" 
+              required
+              placeholder="Ingrese la descripción"
+            >
+          </div>
+
+          <button type="submit" id="AddCategoriaModal" class="btn btn-primary">
+            {{ isEditing ? 'Guardar cambios' : 'Agregar Categoria' }}
+          </button>
+          <button type="button" id="BtnCerrar" class="btn btn-secondary" @click="closeModal">
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div v-if="showDeleteModal" class="modal">
+      <div class="modal-content">
+        <h2>Confirmar Eliminación</h2>
+        <p>¿Está seguro que desea eliminar esta categoría?</p>
+        <button class="btn btn-danger" @click="deleteCategoria">Eliminar</button>
+        <button class="btn btn-secondary" @click="closeDeleteModal">Cancelar</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { guardReactiveProps } from 'vue';
 import ProfileButton from '../components/ProfileButton.vue';
+import ExportButton from '@/components/ExportButton.vue';
+import solicitudes from '../../services/Solicitudes';
 
 export default {
+  name: 'CategoriaEmpresa',
+  
   components: {
     ProfileButton,
+    ExportButton,
   },
+
   data() {
     return {
-      searchQuery: '', // Almacena el texto de búsqueda
-      isModalOpen: false,
+      searchQuery: '',
+      loading: true,
+      error: null,
+      categorias: [],
+      currentPage: 1,
+      pageSize: 10,
+      showModal: false,
+      showDeleteModal: false,
       isEditing: false,
-      editIndex: null,
-      itemsPerPage: "",
+      selectedCategoriaId: null,
       categoriaForm: {
-        nombre: '',
+        categoria: '',
         descripcion: '',
       },
-      categorias: [
-        { nombre: 'CategoriaEmpresa #1', descripcion:'descripcion #1' },
-        { nombre: 'CategoriaEmpresa #2', descripcion:'descripcion #2' },
-        { nombre: 'CategoriaEmpresa #3', descripcion:'descripcion #3' },
-      ]
+      columns: [
+        { header: '#', datakey: 'index' },
+        { header: 'Categoria', datakey: 'categoria' },
+        { header: 'Descripción', datakey: 'descripcion' },
+      ],
+      rows: []
     };
   },
 
   computed: {
     filteredCategorias() {
-      // Filtra las categorias basados en el texto de búsqueda
-      return this.categorias.filter(categoria =>
-        categoria.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        categoria.descripcion.includes(this.searchQuery)
-      );
+      return this.categorias.filter(categoria => {
+        const searchTerm = this.searchQuery.toLowerCase();
+        return categoria.categoria.toLowerCase().includes(searchTerm) ||
+               categoria.descripcion.toLowerCase().includes(searchTerm);
+      });
+    },
+    
+    paginatedCategorias() {
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      return this.filteredCategorias.slice(startIndex, endIndex);
     },
 
-    paginatedCategorias() {
-
-      if (this.itemsPerPage === "" || this.itemsPerPage === null) {
-        return this.filteredCategorias;
-      } else {
-        return this.filteredCategorias.slice(0, parseInt(this.itemsPerPage));
-      }
+    totalPages() {
+      return Math.ceil(this.filteredCategorias.length / this.pageSize);
     }
-
   },
 
   methods: {
-    openModal(){
-      this.isModalOpen = true;
+    async fetchCategorias() {
+      try {
+        this.loading = true;
+        this.error = null;
+        this.categorias = await solicitudes.fetchCategorias();
+        this.generateRows();
+      } catch (error) {
+        this.error = 'Error al cargar las categorías: ' + error.message;
+        console.error('Error:', error);
+      } finally {
+        this.loading = false;
+      }
     },
 
-    closeModal(){
-      this.isModalOpen = false;
-      this.clearForm();
-    },
-
-    clearForm() {
+    editCategoria(categoria) {
       this.categoriaForm = {
-        nombre: '',
-        descripcion: '',
-      }
-      this.isEditing = false;
-      this.editIndex = null;
-    },
-
-
-    guardarCategoria() {
-      if (this.isEditing) {
-        this.categorias[this.editIndex] = {...this.categoriaForm};
-      }else {
-        this.categorias.push({...this.categoriaForm});
-      }
-      this.closeModal();
-    },
-
-    editCategoria(index) {
-      this.categoriaForm = {...this.categorias[index]};
+        categoria: categoria.categoria,
+        descripcion: categoria.descripcion,
+      };
+      this.selectedCategoriaId = categoria.id_categoria;
       this.isEditing = true;
-      this.editIndex = index;
-      this.openModal();
+      this.showModal = true;
     },
 
-    deleteCategorias(index) {
-      this.categorias.splice(index, 1);
+    async guardarCategoria() {
+      try {
+        if (this.isEditing) {
+          await solicitudes.actualizarCategoria(this.selectedCategoriaId, this.categoriaForm);
+        } else {
+          await solicitudes.crearCategoria(this.categoriaForm);
+        }
+        await this.fetchCategorias();
+        this.closeModal();
+      } catch (error) {
+        console.error('Error al guardar categoría:', error);
+      }
     },
+
+    showDeleteConfirm(id) {
+      this.selectedCategoriaId = id;
+      this.showDeleteModal = true;
+    },
+
+    async deleteCategoria() {
+      try {
+        await solicitudes.eliminarCategoria(this.selectedCategoriaId);
+        await this.fetchCategorias();
+        this.closeDeleteModal();
+      } catch (error) {
+        console.error('Error al eliminar categoría:', error);
+      }
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.isEditing = false;
+      this.selectedCategoriaId = null;
+      this.categoriaForm = {
+        categoria: '',
+        descripcion: '',
+      };
+    },
+
+    closeDeleteModal() {
+      this.showDeleteModal = false;
+      this.selectedCategoriaId = null;
+    },
+
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+
+    generateRows() {
+      this.rows = this.paginatedCategorias.map((categoria, index) => ({
+        index: ((this.currentPage - 1) * this.pageSize) + index + 1,
+        categoria: categoria.categoria,
+        descripcion: categoria.descripcion,
+      }));
+    }
   },
+
+  watch: {
+    paginatedCategorias() {
+      this.generateRows();
+    },
+    searchQuery() {
+      this.currentPage = 1;
+    }
+  },
+
+  mounted() {
+    this.fetchCategorias();
+  }
 };
 </script>
 
@@ -458,5 +578,82 @@ h1 {
   cursor: pointer;
   width: 80px;
   /* Ajusta el ancho a 120px o el valor que prefieras */
+}
+.pagination-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+
+
+  .pagination-container {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .pagination-button {
+    min-width: 80px;
+  }
+
+  /* Estilos para la paginación */
+.loading-indicator,
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.pagination-wrapper {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  /* Estilos de Paginación */
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.pagination-info {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.pagination-container {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+.pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #f8f9fa;
 }
 </style>

@@ -1,34 +1,29 @@
 <template>
   <div class="encabezado">
-    <h1>Administracion de Empresas</h1>
+    <h1>Administración de Empresas</h1>
     <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
   </div>
   <hr>
 
   <div class="empresas-wrapper">
     <div class="opciones">
-      <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">
-        Agregar Empresas</button>
       <ExportButton :columns="columns" :rows="rows" fileName="Empresas.pdf" class="export-button"/>
-
-      <div class="registros">
-        <span> Mostrar
-          <select v-model="itemsPerPage" class="custom-select">
-            <option value="">Todos</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="25">25</option>
-          </select> registros
-        </span>
-      </div>
 
       <!--Barra de busqueda-->
       <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empresas...." />
     </div>
 
-    <div class="table-container">
+    <!-- Loading indicator -->
+    <div v-if="loading" class="loading-container">
+      <span>Cargando empresas...</span>
+    </div>
+
+    <!-- Error message -->
+    <div v-else-if="error" class="error-container">
+      <span>{{ error }}</span>
+    </div>
+
+    <div v-else class="table-container">
       <table class="table">
         <thead>
           <tr>
@@ -37,38 +32,61 @@
             <th>RTN</th>
             <th>Categoria de Empresa</th>
             <th>Telefono</th>
-            <th>Direccion</th>
+            <th>Dirección</th>
             <th>Correo</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(empresa,index) in paginatedEmpresas" :key="index">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="(empresa, index) in paginatedEmpresas" :key="empresa.id_empresa">
+            <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
             <td>{{ empresa.nombre }}</td>
             <td>{{ empresa.rtn }}</td>
-            <td>{{ empresa.categoriaEmpresa }}</td>
-            <td>{{ empresa.telefono }}</td>
+            <td>{{ empresa.categoria_empresa?.categoria }}</td>
+            <td>{{ empresa.telefono_principal }}</td>
             <td>{{ empresa.direccion }}</td>
-            <td>{{ empresa.correo }}</td>
+            <td>{{ empresa.correo_principal }}</td>
             <td>
-            <button id="btnEditar" class="btn btn-warning" @click="editEmpresas(index)">
-              <i class="bi bi-pencil-fill"></i>
-            </button>
-            <button id="btnEliminar" class="btn btn-danger" @click="deleteEmpresa(index)"><b><i
-              class="bi bi-x-lg"></i></b></button>
+              <button id="btnEditar" class="btn btn-warning" @click="editEmpresa(empresa.id_empresa)">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button id="btnEliminar" class="btn btn-danger" @click="showDeleteConfirm(empresa.id_empresa)">
+                <i class="bi bi-x-lg"></i>
+              </button>
             </td>
           </tr>
-
         </tbody>
       </table>
+
+      <!-- Paginación -->
+      <div class="pagination-wrapper">
+        <div class="pagination-info">
+          Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, filteredEmpresas.length) }} de {{ filteredEmpresas.length }} registros
+        </div>
+        <div class="pagination-container">
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === 1"
+            @click="previousPage"
+          >
+            Anterior
+          </button>
+          
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === totalPages"
+            @click="nextPage"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
 
-
-    <!-- Modal para agregar o editar empresas-->
-    <div v-if="isModalOpen" class="modal">
+    <!-- Modal de edición -->
+    <div v-if="showModal" class="modal">
       <div class="modal-content">
-        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Empresa' : 'Agregar Empresa' }} </h2>
+        <h2 class="h2-modal-content">Editar Empresa</h2>
 
         <div class="form-group">
           <label>Nombre:</label>
@@ -77,7 +95,7 @@
 
         <div class="form-group">
           <label>Correo:</label>
-          <input v-model="empresaForm.correo" type="text" required>
+          <input v-model="empresaForm.correo_principal" type="email" required>
         </div>
 
         <div class="form-group">
@@ -86,13 +104,8 @@
         </div>
 
         <div class="form-group">
-          <label>Telefono:</label>
-          <input v-model="empresaForm.telefono" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label>Categoria Empresa:</label>
-          <input v-model="empresaForm.categoriaEmpresa" type="text" required>
+          <label>Teléfono:</label>
+          <input v-model="empresaForm.telefono_principal" type="text" required>
         </div>
 
         <div class="form-group">
@@ -100,22 +113,33 @@
           <input v-model="empresaForm.direccion" type="text" required>
         </div>
 
-        <button id="AddEmpresaModal" class="btn btn-primary" @click="guardarEmpresa">
-          {{ isEditing ? 'Guardar Cambios' : 'Agregar Empresa' }}
+        <button id="AddEmpresaModal" class="btn btn-primary" @click="updateEmpresa">
+          Guardar Cambios
         </button>
         <button id="BtnCerrar" class="btn btn-secondary" @click="closeModal">Cerrar</button>
       </div>
     </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div v-if="showDeleteModal" class="modal">
+      <div class="modal-content">
+        <h2>Confirmar Eliminación</h2>
+        <p>¿Está seguro que desea eliminar esta empresa?</p>
+        <button class="btn btn-danger" @click="deleteEmpresa">Eliminar</button>
+        <button class="btn btn-secondary" @click="closeDeleteModal">Cancelar</button>
+      </div>
+    </div>
   </div>
-
 </template>
-
 
 <script>
 import ProfileButton from '../components/ProfileButton.vue';
 import ExportButton from '@/components/ExportButton.vue';
+import empresaService from '../../services/Solicitudes';
 
 export default {
+  name: 'EmpresasView',
+  
   components: {
     ProfileButton,
     ExportButton,
@@ -123,155 +147,164 @@ export default {
 
   data() {
     return {
-      searchQuery: '', // Almacena el texto de búsqueda
-      itemsPerPage: "", // Valor por defecto para mostrar todos los registros
-      isModalOpen: false,
-      isEditing: false,
-      editIndex: null,
+      searchQuery: '',
+      loading: true,
+      error: null,
+      empresas: [],
+      currentPage: 1,
+      pageSize: 10,
+      showModal: false,
+      showDeleteModal: false,
+      selectedEmpresaId: null,
       empresaForm: {
         nombre: '',
         rtn: '',
-        telefono: '',
+        telefono_principal: '',
         direccion: '',
-        correo: '',
-        categoriaEmpresa: '',
+        correo_principal: '',
       },
-
-      empresas: [
-        {
-          nombre: 'Libreria Coello',
-          rtn: '05678901234',
-          telefono: '555 57 67',
-          direccion: 'calle 27 # 40 - 36',
-          correo: 'libreriaCoello@gmail.com',
-          categoriaEmpresa : 'CategoriaEmpresa#1',
-        },
-        {
-          nombre: 'Panaderia y Reposteria Las Espigas',
-          rtn: '01345566239',
-          telefono: '504 22 33 44',
-          direccion: 'avenida 10, zona norte',
-          correo: 'panaderiaEspigas@gmail.com',
-          categoriaEmpresa : 'CategoriaEmpresa#2',
-        },
-
-        {
-          nombre: 'Ferreteria La Cumbre',
-          rtn: '02431133567',
-          telefono: '504 34 12 23',
-          direccion: 'avenida 12, zona central',
-          correo: 'Lacumbre@gmail.com',
-          categoriaEmpresa : 'CategoriaEmpresa#2',
-        },
-
-        {
-          nombre: 'Textiles EL Caribe',
-          rtn: '09761324564',
-          telefono: '504 21 33  56 07',
-          direccion: 'Parque Central, 2da avenida',
-          correo: 'textileCeiba@gmail.com',
-          categoriaEmpresa : 'CategoriaEmpresa#3',
-        },
-
-        {
-          nombre: 'Carnitas del Pablo',
-          rtn: '08675412223',
-          telefono: '504 21 44 60 12',
-          direccion: 'Avenida San Isidro, cerca del Muelle Turistico Reynaldo Canales',
-          correo: 'CarnitasPablo@gmail.com',
-          categoriaEmpresa : 'CategoriaEmpresa#1',
-        },
-      ],
-
-      // Define tus columnas para la exportacion a PDF
       columns: [
         { header: '#', datakey: 'index' },
         { header: 'Nombre', datakey: 'nombre' },
-        { header: 'Ciudad', datakey: 'ciudad' },
-        { header: 'Teléfono', datakey: 'telefono' },
-        { header: 'Correo', datakey: 'correo' },
+        { header: 'RTN', datakey: 'rtn' },
+        { header: 'Teléfono', datakey: 'telefono_principal' },
+        { header: 'Correo', datakey: 'correo_principal' },
       ],
-      rows: [] // Inicialmente vacio, se llena despues
+      rows: []
     };
   },
 
   computed: {
     filteredEmpresas() {
-      // Filtra las empresas basados en el texto de busqueda
-      return this.empresas.filter(empresa =>
-        empresa.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        empresa.ciudad.includes(this.searchQuery)
-      );
+      return this.empresas.filter(empresa => {
+        const searchTerm = this.searchQuery.toLowerCase();
+        return empresa.nombre.toLowerCase().includes(searchTerm) ||
+               empresa.rtn.toLowerCase().includes(searchTerm) ||
+               empresa.correo_principal.toLowerCase().includes(searchTerm);
+      });
     },
+    
     paginatedEmpresas() {
-      return this.itemsPerPage === "" || this.itemsPerPage === null
-        ? this.filteredEmpresas
-        : this.filteredEmpresas.slice(0, this.itemsPerPage);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      return this.filteredEmpresas.slice(startIndex, endIndex);
     },
+
+    totalPages() {
+      return Math.ceil(this.filteredEmpresas.length / this.pageSize);
+    }
   },
+
   methods: {
-    openModal() {
-      this.isModalOpen = true;
+    async fetchEmpresas() {
+      try {
+        this.loading = true;
+        this.error = null;
+        this.empresas = await empresaService.fetchEmpresas();
+        this.generateRows();
+      } catch (error) {
+        this.error = 'Error al cargar las empresas: ' + error.message;
+        console.error('Error:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async editEmpresa(id) {
+      try {
+        const empresa = await empresaService.fetchEmpresaById(id);
+        this.empresaForm = {
+          nombre: empresa.nombre,
+          rtn: empresa.rtn,
+          telefono_principal: empresa.telefono_principal,
+          direccion: empresa.direccion,
+          correo_principal: empresa.correo_principal,
+        };
+        this.selectedEmpresaId = id;
+        this.showModal = true;
+      } catch (error) {
+        console.error('Error al cargar empresa:', error);
+      }
+    },
+
+    async updateEmpresa() {
+      try {
+        await empresaService.patchEmpresa(this.selectedEmpresaId, this.empresaForm);
+        await this.fetchEmpresas();
+        this.closeModal();
+      } catch (error) {
+        console.error('Error al actualizar empresa:', error);
+      }
+    },
+
+    showDeleteConfirm(id) {
+      this.selectedEmpresaId = id;
+      this.showDeleteModal = true;
+    },
+
+    async deleteEmpresa() {
+      try {
+        await empresaService.deleteEmpresa(this.selectedEmpresaId);
+        await this.fetchEmpresas();
+        this.closeDeleteModal();
+      } catch (error) {
+        console.error('Error al eliminar empresa:', error);
+      }
     },
 
     closeModal() {
-      this.isModalOpen = false;
-      this.isEditing = false;
+      this.showModal = false;
+      this.selectedEmpresaId = null;
       this.empresaForm = {
         nombre: '',
-        ciudad: '',
-        telefono: '',
+        rtn: '',
+        telefono_principal: '',
         direccion: '',
-        correo: '',
+        correo_principal: '',
       };
     },
 
-    guardarEmpresa() {
-      if(this.isEditing) {
-        Object.assign(this.empresas[this.editIndex], this.empresaForm);
-      }else{
-        this.empresas.push({ ...this.empresaForm});
+    closeDeleteModal() {
+      this.showDeleteModal = false;
+      this.selectedEmpresaId = null;
+    },
+
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
       }
-      this.closeModal();
     },
 
-    editEmpresas(index) {
-      this.isModalOpen = true;
-      this.isEditing = true;
-      this.editIndex = index;
-      this.empresaForm = { ...this.empresas[index] };
-    },
-
-    deleteEmpresa(index) {
-      this.empresas.splice(index, 1);
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
     },
 
     generateRows() {
-      // Genera las filas basadas en las empresas paginados
-      this.rows = this.paginatedEmpresas.map((sucursal,index) => ({
-        index: index + 1,
-        nombre: sucursal.nombre,
-        ciudad: sucursal.ciudad,
-        telefono: sucursal.telefono,
-        correo: sucursal.correo,
-
+      this.rows = this.paginatedEmpresas.map((empresa, index) => ({
+        index: ((this.currentPage - 1) * this.pageSize) + index + 1,
+        nombre: empresa.nombre,
+        rtn: empresa.rtn,
+        telefono_principal: empresa.telefono_principal,
+        correo_principal: empresa.correo_principal,
       }));
-      console.log('Failas generadas', this.rows);
     }
   },
 
   watch: {
-    // Cuando cambie la paginación o el filtro, actualiza las filas
     paginatedEmpresas() {
       this.generateRows();
+    },
+    searchQuery() {
+      this.currentPage = 1;
     }
   },
+
   mounted() {
-    // Genera las filas al cargar el componente
-    this.generateRows();
+    this.fetchEmpresas();
   }
 };
-
 </script>
 
 <style scoped>
@@ -296,6 +329,16 @@ export default {
   justify-content: space-between;
 }
 
+.loading-container, .error-container {
+  text-align: center;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.error-container {
+  color: #dc3545;
+}
+
 .busqueda {
   float: right;
   padding: 10px;
@@ -304,33 +347,17 @@ export default {
   border-width: 0.5px;
 }
 
-.registros{
+.registros {
   height: 100%;
   padding-bottom: 1%;
 }
 
-#btnAdd {
-  background-color: #c09d62;
-  font-size: 16px;
-  width: 170px;
-  height: 40px;
-  border-radius: 10px;
-  color: black;
-  font-weight: bold;
-}
-
-.export-button{
+.export-button {
   margin: 0;
 }
 
 .h2-modal-content {
   margin-top: 0px;
-}
-
-#btnAdd:hover {
-  background-color: #a38655;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
 }
 
 #btnEditar {
@@ -360,36 +387,9 @@ export default {
   transition: all 0.3s ease;
 }
 
-#campana {
-  margin-right: 10px;
-  font-size: 18px;
-  color: #a38655;
-}
-
-.container-top {
-  width: 100%;
-  text-align: right;
-}
-
-.rol {
-  color: #969696;
-  font-size: 14px;
-}
-
-select {
-  border: 1px solid #ccc;
-  margin-top: 10px;
-  margin-left: 5px;
-  margin-right: 5px;
-  width: 60px;
-  height: 35px;
-  border-radius: 5px;
-}
-
 .empresas-wrapper {
   padding: 16px;
 }
-
 
 .table-container {
   width: 100%;
@@ -408,43 +408,60 @@ select {
 .table th,
 .table td {
   padding: 8px;
+  text-align: center;
 }
 
 .table thead th {
   background-color: none;
-  text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
 .table tbody td {
-  text-align: center;
   border-top: 1px solid #ddd;
 }
 
-.table thead th:first-child {
-  border-top-left-radius: 10px;
+/* Estilos del Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.table thead th:last-child {
-  border-top-right-radius: 10px;
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
+.form-group {
+  margin-bottom: 16px;
 }
 
-.table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
-.btn {
-  padding: 8px 16px;
-  margin: 4px;
-  border: none;
-  cursor: pointer;
+.form-group input {
+  width: 95%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
-
+/* Estilos de los botones */
 #AddEmpresaModal {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -454,6 +471,11 @@ select {
   background-color: #007bff;
   cursor: pointer;
   margin-right: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+#AddEmpresaModal:hover {
+  background-color: #0056b3;
 }
 
 #BtnCerrar {
@@ -465,78 +487,136 @@ select {
   color: #fff;
   cursor: pointer;
   margin-right: 1rem;
+  transition: background-color 0.3s ease;
 }
 
-.btn-warning {
-  background-color: #ffc107;
-  color: black;
+#BtnCerrar:hover {
+  background-color: rgb(75, 80, 83);
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+/* Estilos de Paginación */
+.pagination-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
 }
 
-.modal-content {
+.pagination-info {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.pagination-container {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
   background-color: white;
-  padding: 20px;
+  color: #495057;
+  cursor: pointer;
   border-radius: 4px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 16px;
-
-}
-
-.form-group label {
-  display: flexbox;
-  margin-bottom: 8px;
-}
-
-.form-group input {
-  width: 95%;
-  height: 25%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.custom-select {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  height: 35px;
-  font-size: 16px;
-  padding: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  width: 80px;
-  /* Ajusta el ancho a 120px o el valor que prefieras */
+.pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #212529;
 }
 
-.custom-select:focus {
-  outline: none;
-  border-color: #a38655;
-  /* Ajusta el color del borde al de tu diseño */
+.pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #f8f9fa;
 }
 
-.custom-select option {
-  font-size: 16px;
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .encabezado {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .opciones {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .busqueda {
+    width: 100%;
+    max-width: none;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .pagination-wrapper {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .pagination-container {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .pagination-button {
+    min-width: 80px;
+  }
+
+  .modal-content {
+    margin: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 }
 
+@media screen and (max-width: 480px) {
+  .encabezado h1 {
+    font-size: 1.5rem;
+  }
 
+  .table th,
+  .table td {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  #btnEditar,
+  #btnEliminar {
+    width: 40px;
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .pagination-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+
+  .form-group input {
+    width: 90%;
+  }
+
+  #AddEmpresaModal,
+  #BtnCerrar {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
 </style>
