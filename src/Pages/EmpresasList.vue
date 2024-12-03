@@ -8,8 +8,6 @@
   <div class="empresas-wrapper">
     <div class="opciones">
       <ExportButton :columns="columns" :rows="rows" fileName="Empresas.pdf" class="export-button"/>
-
-      <!--Barra de busqueda-->
       <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar empresas...." />
     </div>
 
@@ -47,9 +45,6 @@
             <td>{{ empresa.direccion }}</td>
             <td>{{ empresa.correo_principal }}</td>
             <td>
-              <button id="btnEditar" class="btn btn-warning" @click="editEmpresa(empresa.id_empresa)">
-                <i class="bi bi-pencil-fill"></i>
-              </button>
               <button id="btnEliminar" class="btn btn-danger" @click="showDeleteConfirm(empresa.id_empresa)">
                 <i class="bi bi-x-lg"></i>
               </button>
@@ -83,49 +78,12 @@
       </div>
     </div>
 
-    <!-- Modal de edición -->
-    <div v-if="showModal" class="modal">
-      <div class="modal-content">
-        <h2 class="h2-modal-content">Editar Empresa</h2>
-
-        <div class="form-group">
-          <label>Nombre:</label>
-          <input v-model="empresaForm.nombre" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label>Correo:</label>
-          <input v-model="empresaForm.correo_principal" type="email" required>
-        </div>
-
-        <div class="form-group">
-          <label>RTN:</label>
-          <input v-model="empresaForm.rtn" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label>Teléfono:</label>
-          <input v-model="empresaForm.telefono_principal" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label>Dirección:</label>
-          <input v-model="empresaForm.direccion" type="text" required>
-        </div>
-
-        <button id="AddEmpresaModal" class="btn btn-primary" @click="updateEmpresa">
-          Guardar Cambios
-        </button>
-        <button id="BtnCerrar" class="btn btn-secondary" @click="closeModal">Cerrar</button>
-      </div>
-    </div>
-
     <!-- Modal de confirmación de eliminación -->
     <div v-if="showDeleteModal" class="modal">
       <div class="modal-content">
-        <h2>Confirmar Eliminación</h2>
-        <p>¿Está seguro que desea eliminar esta empresa?</p>
-        <button class="btn btn-danger" @click="deleteEmpresa">Eliminar</button>
+        <h2>Confirmar Desactivación</h2>
+        <p>¿Está seguro que desea desactivar esta empresa?</p>
+        <button class="btn btn-danger" @click="deleteEmpresa">Desactivar</button>
         <button class="btn btn-secondary" @click="closeDeleteModal">Cancelar</button>
       </div>
     </div>
@@ -153,16 +111,8 @@ export default {
       empresas: [],
       currentPage: 1,
       pageSize: 10,
-      showModal: false,
       showDeleteModal: false,
       selectedEmpresaId: null,
-      empresaForm: {
-        nombre: '',
-        rtn: '',
-        telefono_principal: '',
-        direccion: '',
-        correo_principal: '',
-      },
       columns: [
         { header: '#', datakey: 'index' },
         { header: 'Nombre', datakey: 'nombre' },
@@ -210,33 +160,6 @@ export default {
       }
     },
 
-    async editEmpresa(id) {
-      try {
-        const empresa = await empresaService.fetchEmpresaById(id);
-        this.empresaForm = {
-          nombre: empresa.nombre,
-          rtn: empresa.rtn,
-          telefono_principal: empresa.telefono_principal,
-          direccion: empresa.direccion,
-          correo_principal: empresa.correo_principal,
-        };
-        this.selectedEmpresaId = id;
-        this.showModal = true;
-      } catch (error) {
-        console.error('Error al cargar empresa:', error);
-      }
-    },
-
-    async updateEmpresa() {
-      try {
-        await empresaService.patchEmpresa(this.selectedEmpresaId, this.empresaForm);
-        await this.fetchEmpresas();
-        this.closeModal();
-      } catch (error) {
-        console.error('Error al actualizar empresa:', error);
-      }
-    },
-
     showDeleteConfirm(id) {
       this.selectedEmpresaId = id;
       this.showDeleteModal = true;
@@ -248,20 +171,8 @@ export default {
         await this.fetchEmpresas();
         this.closeDeleteModal();
       } catch (error) {
-        console.error('Error al eliminar empresa:', error);
+        console.error('Error al desactivar empresa:', error);
       }
-    },
-
-    closeModal() {
-      this.showModal = false;
-      this.selectedEmpresaId = null;
-      this.empresaForm = {
-        nombre: '',
-        rtn: '',
-        telefono_principal: '',
-        direccion: '',
-        correo_principal: '',
-      };
     },
 
     closeDeleteModal() {
@@ -356,23 +267,6 @@ export default {
   margin: 0;
 }
 
-.h2-modal-content {
-  margin-top: 0px;
-}
-
-#btnEditar {
-  font-size: 18px;
-  width: 50px;
-  height: 40px;
-  border-radius: 10px;
-}
-
-#btnEditar:hover {
-  background-color: #e8af06;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
-}
-
 #btnEliminar {
   font-size: 18px;
   width: 50px;
@@ -441,57 +335,6 @@ export default {
   max-width: 500px;
   width: 100%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 95%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-/* Estilos de los botones */
-#AddEmpresaModal {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #007bff;
-  cursor: pointer;
-  margin-right: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-#AddEmpresaModal:hover {
-  background-color: #0056b3;
-}
-
-#BtnCerrar {
-  background-color: rgb(93, 100, 104);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  margin-right: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-#BtnCerrar:hover {
-  background-color: rgb(75, 80, 83);
 }
 
 /* Estilos de Paginación */
@@ -596,7 +439,6 @@ export default {
     font-size: 14px;
   }
 
-  #btnEditar,
   #btnEliminar {
     width: 40px;
     height: 35px;
@@ -607,16 +449,6 @@ export default {
     padding: 6px 12px;
     font-size: 12px;
     min-width: 70px;
-  }
-
-  .form-group input {
-    width: 90%;
-  }
-
-  #AddEmpresaModal,
-  #BtnCerrar {
-    width: 100%;
-    margin-bottom: 0.5rem;
   }
 }
 </style>

@@ -11,19 +11,6 @@
         Agregar Usuario
       </button>
 
-      <div class="registros">
-        <span>Mostrar
-          <select v-model="itemsPerPage" class="custom-select">
-            <option value="">Todos</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="25">25</option>
-          </select> registros
-        </span>
-      </div>
-
       <div class="search-bar">
         <input 
           class="busqueda" 
@@ -51,33 +38,62 @@
         </thead>
         <tbody>
           <tr v-for="(empleado, index) in paginatedEmpleados" :key="empleado.id_usuario">
-            <td>{{ index + 1 }}</td>
+            <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
             <td>{{ empleado.nombre }}</td>
             <td>{{ empleado.apellido }}</td>
             <td>{{ empleado.nombre_usuario }}</td>
-            <td>{{ empleado.contraseña }}</td>
+            <td class="password-cell">
+              <span>{{ empleado.showPassword ? empleado.contraseña : '*'.repeat(8) }}</span>
+              <i 
+                :class="empleado.showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"
+                class="toggle-password-table"
+                @click="togglePasswordVisibilityInTable(empleado)"
+              ></i>
+            </td>
             <td>{{ empleado.correo }}</td>
             <td>{{ empleado.telefono }}</td>
             <td>{{ empleado.direccion }}</td>
             <td>
-              <button class="btn btn-warning" @click="editEmpleado(empleado)">
-                <i class="bi bi-pencil-fill"></i>
-              </button>
               <button class="btn btn-danger" @click="desactivarEmpleado(empleado.id_usuario)">
                 <i class="bi bi-x-lg"></i>
               </button>
             </td>
           </tr>
+          <tr v-if="paginatedEmpleados.length === 0">
+            <td colspan="9" class="text-center">No hay usuarios disponibles</td>
+          </tr>
         </tbody>
       </table>
+
+      <!-- Paginación -->
+      <div v-if="filteredEmpleados.length > 0" class="pagination-wrapper">
+        <div class="pagination-info">
+          Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, filteredEmpleados.length) }} de {{ filteredEmpleados.length }} registros
+        </div>
+        <div class="pagination-container">
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === 1"
+            @click="previousPage"
+          >
+            Anterior
+          </button>
+          
+          <button 
+            class="pagination-button" 
+            :disabled="currentPage === totalPages"
+            @click="nextPage"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Modal para agregar o editar empleados -->
+    <!-- Modal para agregar empleados -->
     <div v-if="isModalOpen" class="modal">
       <div class="modal-content">
-        <h2 class="h2-modal-content">
-          {{ isEditing ? 'Editar Empleado' : 'Agregar Empleado' }}
-        </h2>
+        <h2 class="h2-modal-content">Agregar Usuario</h2>
 
         <div class="contenedor-principal">
           <div class="contenedor contenedor-izquierdo">
@@ -168,7 +184,7 @@
           class="btn btn-primary" 
           @click="guardarEmpleado"
         >
-          {{ isEditing ? 'Guardar Cambios' : 'Agregar Empleado' }}
+          Agregar Usuario
         </button>
         <button 
           class="btn btn-secondary" 
@@ -194,9 +210,10 @@ export default {
     return {
       searchQuery: '',
       isModalOpen: false,
-      isEditing: false,
       showPassword: false,
-      itemsPerPage: "",
+      currentPage: 1,
+      pageSize: 10,
+      itemsPerPage: "10",
       empleadoForm: {
         nombre: '',
         apellido: '',
@@ -221,10 +238,16 @@ export default {
     },
 
     paginatedEmpleados() {
-      if (this.itemsPerPage === "" || this.itemsPerPage === null) {
+      if (this.itemsPerPage === "") {
         return this.filteredEmpleados;
       }
-      return this.filteredEmpleados.slice(0, parseInt(this.itemsPerPage));
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      return this.filteredEmpleados.slice(startIndex, endIndex);
+    },
+
+    totalPages() {
+      return Math.ceil(this.filteredEmpleados.length / this.pageSize);
     }
   },
 
@@ -232,15 +255,17 @@ export default {
     async loadEmpleados() {
       try {
         this.empleados = await solicitudes.fetchUsuarios();
+        this.empleados = this.empleados.map(emp => ({
+          ...emp,
+          showPassword: false
+        }));
       } catch (error) {
         console.error('Error al cargar empleados:', error);
-        // Aquí podrías agregar una notificación de error
       }
     },
 
     openModal() {
       this.isModalOpen = true;
-      this.isEditing = false;
       this.clearForm();
     },
 
@@ -264,25 +289,12 @@ export default {
 
     async guardarEmpleado() {
       try {
-        if (this.isEditing) {
-          await solicitudes.actualizarUsuario(this.empleadoForm.id_usuario, this.empleadoForm);
-        } else {
-          await solicitudes.crearUsuario(this.empleadoForm);
-        }
-        
+        await solicitudes.crearUsuario(this.empleadoForm);
         this.closeModal();
         await this.loadEmpleados();
-        // Aquí podrías agregar una notificación de éxito
       } catch (error) {
         console.error('Error al guardar empleado:', error);
-        // Aquí podrías agregar una notificación de error
       }
-    },
-
-    editEmpleado(empleado) {
-      this.isEditing = true;
-      this.empleadoForm = { ...empleado };
-      this.isModalOpen = true;
     },
 
     async desactivarEmpleado(id_usuario) {
@@ -290,16 +302,40 @@ export default {
         try {
           await solicitudes.desactivarUsuario(id_usuario, false);
           await this.loadEmpleados();
-          // Aquí podrías agregar una notificación de éxito
         } catch (error) {
           console.error('Error al desactivar empleado:', error);
-          // Aquí podrías agregar una notificación de error
         }
       }
     },
 
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
+    },
+
+    togglePasswordVisibilityInTable(empleado) {
+      empleado.showPassword = !empleado.showPassword;
+    },
+
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    }
+  },
+
+  watch: {
+    itemsPerPage(newValue) {
+      this.pageSize = newValue === "" ? this.filteredEmpleados.length : parseInt(newValue);
+      this.currentPage = 1;
+    },
+    searchQuery() {
+      this.currentPage = 1;
     }
   },
 
@@ -362,20 +398,6 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.btn-warning {
-  font-size: 18px;
-  width: 50px;
-  height: 40px;
-  border-radius: 10px;
-  margin-right: 5px;
-}
-
-.btn-warning:hover {
-  background-color: #e8af06;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
-}
-
 .btn-danger {
   font-size: 18px;
   width: 50px;
@@ -417,6 +439,8 @@ h1 {
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
 }
+
+
 
 .modal {
   position: fixed;
@@ -477,6 +501,25 @@ h1 {
   cursor: pointer;
 }
 
+.password-cell {
+  position: relative;
+  min-width: 120px;
+}
+
+.toggle-password-table {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+}
+
+.toggle-password-table:hover {
+  color: #333;
+}
+
 .custom-select {
   padding: 5px;
   border-radius: 5px;
@@ -500,4 +543,57 @@ button {
   background-color: #6c757d;
   color: white;
 }
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.pagination-info {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.pagination-container {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+.pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #f8f9fa;
+}
+
+.text-center {
+  text-align: center;
+}
+
+
+
 </style>

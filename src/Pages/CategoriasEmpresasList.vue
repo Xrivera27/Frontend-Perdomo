@@ -1,54 +1,47 @@
 <template>
-  <div class="encabezado">
-    <h1>Categorias de Empresas</h1>
-    <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
-  </div>
-  <hr>
-
   <div class="categorias-empresas-wrapper">
+    <div class="encabezado">
+      <h1>Categorías de Empresas</h1>
+      <ProfileButton :companyName="'Perdomo y Asociados'" :role="'Gerente'" />
+    </div>
+    <hr>
+
     <div class="opciones">
-      <button id="btnAdd" class="btn btn-primary" @click="openModal" style="width: 200px; white-space: nowrap;">
-        Agregar Categoria
+      <button class="btn-primary" @click="openModal">
+        Agregar Categoría
       </button>
 
-      <ExportButton :columns="columns" :rows="rows" fileName="Categorias.pdf" class="export-button"/>
-
       <div class="search-bar">
-        <input class="busqueda" type="text" v-model="searchQuery" placeholder="Buscar categoria..." />
+        <input 
+          class="busqueda" 
+          type="text" 
+          v-model="searchQuery" 
+          placeholder="Buscar categoría..."
+        />
       </div>
     </div>
 
-    <!-- Loading indicator -->
-    <div v-if="loading" class="loading-container">
-      <span>Cargando categorías...</span>
-    </div>
-
-    <!-- Error message -->
-    <div v-else-if="error" class="error-container">
-      <span>{{ error }}</span>
-    </div>
-
-    <div v-else class="table-container">
+    <!-- Tabla de categorías -->
+    <div class="table-container">
       <table class="table">
         <thead>
           <tr>
             <th>#</th>
-            <th>Categoria</th>
+            <th>Categoría</th>
             <th>Descripción</th>
             <th>Acciones</th>
           </tr>
         </thead>
-
         <tbody>
           <tr v-for="(categoria, index) in paginatedCategorias" :key="categoria.id_categoria">
             <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
             <td>{{ categoria.categoria }}</td>
             <td>{{ categoria.descripcion }}</td>
             <td>
-              <button id="btnEditar" class="btn btn-warning" @click="editCategoria(categoria)">
+              <button class="btn-warning" @click="editCategoria(categoria)">
                 <i class="bi bi-pencil-fill"></i>
               </button>
-              <button id="btnEliminar" class="btn btn-danger" @click="showDeleteConfirm(categoria.id_categoria)">
+              <button class="btn-danger" @click="showDeleteConfirm(categoria.id_categoria)">
                 <i class="bi bi-x-lg"></i>
               </button>
             </td>
@@ -60,7 +53,7 @@
       </table>
 
       <!-- Paginación -->
-      <div class="pagination-wrapper">
+      <div v-if="filteredCategorias.length > 0" class="pagination-wrapper">
         <div class="pagination-info">
           Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, filteredCategorias.length) }} de {{ filteredCategorias.length }} registros
         </div>
@@ -84,14 +77,14 @@
       </div>
     </div>
 
-    <!-- Modal para agregar y editar categorias -->
+    <!-- Modal para agregar/editar -->
     <div v-if="showModal" class="modal">
       <div class="modal-content">
-        <h2 class="h2-modal-content">{{ isEditing ? 'Editar Categoria' : 'Agregar Categoria' }}</h2>
+        <h2>{{ isEditing ? 'Editar Categoría' : 'Agregar Categoría' }}</h2>
         
         <form @submit.prevent="guardarCategoria">
           <div class="form-group">
-            <label>Categoria:</label>
+            <label>Categoría:</label>
             <input 
               v-model="categoriaForm.categoria" 
               type="text" 
@@ -110,23 +103,27 @@
             >
           </div>
 
-          <button type="submit" id="AddCategoriaModal" class="btn btn-primary">
-            {{ isEditing ? 'Guardar cambios' : 'Agregar Categoria' }}
-          </button>
-          <button type="button" id="BtnCerrar" class="btn btn-secondary" @click="closeModal">
-            Cancelar
-          </button>
+          <div class="modal-buttons">
+            <button type="submit" class="btn-submit">
+              {{ isEditing ? 'Guardar' : 'Agregar' }}
+            </button>
+            <button type="button" class="btn-cancel" @click="closeModal">
+              Cancelar
+            </button>
+          </div>
         </form>
       </div>
     </div>
 
-    <!-- Modal de confirmación de eliminación -->
+    <!-- Modal de confirmación para eliminar -->
     <div v-if="showDeleteModal" class="modal">
       <div class="modal-content">
         <h2>Confirmar Eliminación</h2>
         <p>¿Está seguro que desea eliminar esta categoría?</p>
-        <button class="btn btn-danger" @click="deleteCategoria">Eliminar</button>
-        <button class="btn btn-secondary" @click="closeDeleteModal">Cancelar</button>
+        <div class="modal-buttons">
+          <button class="btn-danger" @click="deleteCategoria">Eliminar</button>
+          <button class="btn-cancel" @click="closeDeleteModal">Cancelar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -134,52 +131,45 @@
 
 <script>
 import ProfileButton from '../components/ProfileButton.vue';
-import ExportButton from '@/components/ExportButton.vue';
 import solicitudes from '../../services/Solicitudes';
 
 export default {
   name: 'CategoriaEmpresa',
   
   components: {
-    ProfileButton,
-    ExportButton,
+    ProfileButton
   },
 
   data() {
     return {
-      searchQuery: '',
-      loading: true,
-      error: null,
       categorias: [],
-      currentPage: 1,
-      pageSize: 10,
+      searchQuery: '',
       showModal: false,
       showDeleteModal: false,
       isEditing: false,
       selectedCategoriaId: null,
+      currentPage: 1,
+      pageSize: 10,
+      itemsPerPage: "10",
       categoriaForm: {
         categoria: '',
-        descripcion: '',
-      },
-      columns: [
-        { header: '#', datakey: 'index' },
-        { header: 'Categoria', datakey: 'categoria' },
-        { header: 'Descripción', datakey: 'descripcion' },
-      ],
-      rows: []
-    };
+        descripcion: ''
+      }
+    }
   },
 
   computed: {
     filteredCategorias() {
-      return this.categorias.filter(categoria => {
-        const searchTerm = this.searchQuery.toLowerCase();
-        return categoria.categoria.toLowerCase().includes(searchTerm) ||
-               categoria.descripcion.toLowerCase().includes(searchTerm);
-      });
+      return this.categorias.filter(categoria =>
+        categoria.categoria.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        categoria.descripcion.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
     },
-    
+
     paginatedCategorias() {
+      if (this.itemsPerPage === "") {
+        return this.filteredCategorias;
+      }
       const startIndex = (this.currentPage - 1) * this.pageSize;
       const endIndex = startIndex + this.pageSize;
       return this.filteredCategorias.slice(startIndex, endIndex);
@@ -193,40 +183,55 @@ export default {
   methods: {
     async fetchCategorias() {
       try {
-        this.loading = true;
-        this.error = null;
-        this.categorias = await solicitudes.fetchCategorias();
-        this.generateRows();
+        const data = await solicitudes.fetchCategorias();
+        this.categorias = data;
       } catch (error) {
-        this.error = 'Error al cargar las categorías: ' + error.message;
         console.error('Error:', error);
-      } finally {
-        this.loading = false;
       }
     },
 
-    editCategoria(categoria) {
-      this.categoriaForm = {
-        categoria: categoria.categoria,
-        descripcion: categoria.descripcion,
-      };
-      this.selectedCategoriaId = categoria.id_categoria;
-      this.isEditing = true;
+    openModal() {
       this.showModal = true;
+      this.isEditing = false;
+      this.categoriaForm = {
+        categoria: '',
+        descripcion: ''
+      };
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.categoriaForm = {
+        categoria: '',
+        descripcion: ''
+      };
     },
 
     async guardarCategoria() {
       try {
         if (this.isEditing) {
-          await solicitudes.actualizarCategoria(this.selectedCategoriaId, this.categoriaForm);
+          await solicitudes.actualizarCategoria(
+            this.selectedCategoriaId, 
+            this.categoriaForm
+          );
         } else {
           await solicitudes.crearCategoria(this.categoriaForm);
         }
-        await this.fetchCategorias();
         this.closeModal();
+        await this.fetchCategorias();
       } catch (error) {
-        console.error('Error al guardar categoría:', error);
+        console.error('Error:', error);
       }
+    },
+
+    editCategoria(categoria) {
+      this.isEditing = true;
+      this.selectedCategoriaId = categoria.id_categoria;
+      this.categoriaForm = {
+        categoria: categoria.categoria,
+        descripcion: categoria.descripcion
+      };
+      this.showModal = true;
     },
 
     showDeleteConfirm(id) {
@@ -234,29 +239,18 @@ export default {
       this.showDeleteModal = true;
     },
 
+    closeDeleteModal() {
+      this.showDeleteModal = false;
+    },
+
     async deleteCategoria() {
       try {
         await solicitudes.eliminarCategoria(this.selectedCategoriaId);
-        await this.fetchCategorias();
         this.closeDeleteModal();
+        await this.fetchCategorias();
       } catch (error) {
-        console.error('Error al eliminar categoría:', error);
+        console.error('Error:', error);
       }
-    },
-
-    closeModal() {
-      this.showModal = false;
-      this.isEditing = false;
-      this.selectedCategoriaId = null;
-      this.categoriaForm = {
-        categoria: '',
-        descripcion: '',
-      };
-    },
-
-    closeDeleteModal() {
-      this.showDeleteModal = false;
-      this.selectedCategoriaId = null;
     },
 
     previousPage() {
@@ -269,20 +263,13 @@ export default {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
       }
-    },
-
-    generateRows() {
-      this.rows = this.paginatedCategorias.map((categoria, index) => ({
-        index: ((this.currentPage - 1) * this.pageSize) + index + 1,
-        categoria: categoria.categoria,
-        descripcion: categoria.descripcion,
-      }));
     }
   },
 
   watch: {
-    paginatedCategorias() {
-      this.generateRows();
+    itemsPerPage(newValue) {
+      this.pageSize = newValue === "" ? this.filteredCategorias.length : parseInt(newValue);
+      this.currentPage = 1;
     },
     searchQuery() {
       this.currentPage = 1;
@@ -292,7 +279,7 @@ export default {
   mounted() {
     this.fetchCategorias();
   }
-};
+}
 </script>
 
 <style scoped>
@@ -302,20 +289,38 @@ export default {
   font-family: 'Montserrat', sans-serif;
 }
 
+.categorias-empresas-wrapper {
+  padding: 20px;
+}
+
 .encabezado {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.categorias-empresas-wrapper {
-  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .opciones {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #c09d62;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #a38655;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
 }
 
 .registros {
@@ -323,87 +328,27 @@ export default {
   padding-bottom: 1%;
 }
 
+.custom-select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin: 0 5px;
+}
+
 .custom-select:focus {
   outline: none;
-  border-color: #a38655;
+  border-color: #c09d62;
 }
 
 .custom-select option {
-  font-size: 16px;
-}
-
-.custom-select {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  height: 35px;
-  font-size: 16px;
-  padding: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  width: 80px;
-  /* Ajusta el ancho a 120px o el valor que prefieras */
+  font-size: 14px;
 }
 
 .busqueda {
-  float: right;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 10px;
-  border-width: 0.5px;
-}
-
-#btnAdd {
-  background-color: #c09d62;
-  width: 140px;
-  height: 40px;
-  border-radius: 10px;
-  font-size: 16px;
-  color: black;
-  font-weight: bold;
-}
-
-#btnAdd:hover {
-  background-color: #a38655;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
-}
-
-#btnEditar {
-  font-size: 18px;
-  width: 50px;
-  height: 40px;
-  border-radius: 10px;
-}
-
-#btnEditar:hover {
-  background-color: #e8af06;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
-}
-
-#btnEliminar {
-  font-size: 18px;
-  width: 50px;
-  height: 40px;
-  border-radius: 10px;
-  color: black;
-}
-
-#btnEliminar:hover {
-  background-color: #b72433;
-  transform: scale(1.05);
-  transition: all 0.3s ease;
-}
-
-#BtnCerrar {
-  background-color: rgb(93, 100, 104);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  margin-right: 1rem;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: 200px;
 }
 
 .table-container {
@@ -411,43 +356,6 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid #ddd;
-  margin-top: 16px;
-}
-
-h1 {
-  color: #d6b602;
-}
-
-.rol {
-  color: #969696;
-  font-size: 14px;
-}
-
-.export-button {
-  margin: 0;
-}
-
-#form-tel {
-  width: 30%;
-}
-
-#campana {
-  margin-right: 10px;
-  font-size: 18px;
-  color: #a38655;
-}
-
-.container-top {
-  width: 100%;
-  text-align: right;
-}
-
-.table-container {
-  width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  margin-top: 16px;
 }
 
 .table {
@@ -456,161 +364,7 @@ h1 {
   border-spacing: 0;
 }
 
-.table th,
-.table td {
-  padding: 8px;
-}
-
-.table thead th {
-  background-color: none;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-}
-
-.table tbody td {
-  text-align: center;
-  border-top: 1px solid #ddd;
-}
-
-.table thead th:first-child {
-  border-top-left-radius: 10px;
-}
-
-.table thead th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-}
-
-.btn {
-  padding: 8px 16px;
-  margin: 4px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-warning {
-  background-color: #ffc107;
-  color: black;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.h2-modal-content {
-  margin-top: 0px;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 4px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 16px;
-
-}
-
-.form-group label {
-  display: flexbox;
-  margin-bottom: 8px;
-}
-
-.form-group input {
-  width: 95%;
-  height: 25%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  justify-content: center;
-}
-
-#AddCategoriaModal {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #007bff;
-  cursor: pointer;
-  margin-right: 1rem;
-}
-
-.custom-select:focus {
-  outline: none;
-  border-color: #a38655;
-}
-
-.custom-select option {
-  font-size: 16px;
-}
-
-.custom-select {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  height: 35px;
-  font-size: 16px;
-  padding: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  width: 80px;
-  /* Ajusta el ancho a 120px o el valor que prefieras */
-}
-.pagination-button {
-    padding: 6px 12px;
-    font-size: 12px;
-    min-width: 70px;
-  }
-
-
-  .pagination-container {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .pagination-button {
-    min-width: 80px;
-  }
-
-  /* Estilos para la paginación */
-.loading-indicator,
-.no-data {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.1rem;
-  color: #666;
-}
-
-.pagination-wrapper {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  /* Estilos de Paginación */
+/* Estilos de Paginación */
 .pagination-wrapper {
   display: flex;
   justify-content: space-between;
@@ -655,5 +409,130 @@ h1 {
   cursor: not-allowed;
   opacity: 0.6;
   background-color: #f8f9fa;
+}
+
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.btn-warning,
+.btn-danger {
+  padding: 5px 10px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e8af06;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #b72433;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-submit {
+  background-color: #c09d62;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #a38655;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+h1 {
+  color: #d6b602;
+  margin: 0;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>
