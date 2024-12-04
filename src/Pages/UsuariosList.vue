@@ -288,14 +288,23 @@ export default {
     },
 
     async guardarEmpleado() {
-      try {
-        await solicitudes.crearUsuario(this.empleadoForm);
-        this.closeModal();
-        await this.loadEmpleados();
-      } catch (error) {
-        console.error('Error al guardar empleado:', error);
-      }
-    },
+  try {
+    await solicitudes.crearUsuario(this.empleadoForm);
+    this.closeModal();
+    await this.loadEmpleados();
+  } catch (error) {
+    if (error.response?.data?.field === 'nombre_usuario') {
+      // Mostrar error de nombre de usuario duplicado
+      alert('El nombre de usuario ya está en uso');
+    } else if (error.response?.data?.field === 'correo') {
+      // Mostrar error de correo duplicado
+      alert('El correo electrónico ya está registrado');
+    } else {
+      console.error('Error al guardar empleado:', error);
+      alert('Error al crear el usuario');
+    }
+  }
+},
 
     async desactivarEmpleado(id_usuario) {
       if (confirm('¿Está seguro de desactivar este usuario?')) {
