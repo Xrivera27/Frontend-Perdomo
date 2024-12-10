@@ -1,5 +1,6 @@
 // services/solicitudes.js
-const homeUrl = 'http://localhost:3000/api';
+const { getApi } = require('../config/getApiUrl');
+  const homeUrl = getApi();
 
 const headers = {
   'Content-Type': 'application/json'
