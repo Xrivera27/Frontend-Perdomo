@@ -17,4 +17,4 @@ const getApi = () => {
     }
 }
 
-module.exports = { getApi };
+export { getApi };

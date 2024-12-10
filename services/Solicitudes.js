@@ -1,5 +1,5 @@
 // services/solicitudes.js
-const { getApi } = require('../config/getApiUrl');
+import { getApi } from '../config/getApiUrl.js';
   const homeUrl = getApi();
 
 const headers = {
