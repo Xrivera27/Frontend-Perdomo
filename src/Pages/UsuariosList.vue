@@ -29,7 +29,6 @@
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Nombre Usuario</th>
-            <th>Contraseña</th>
             <th>Correo</th>
             <th>Teléfono</th>
             <th>Dirección</th>
@@ -42,14 +41,6 @@
             <td>{{ empleado.nombre }}</td>
             <td>{{ empleado.apellido }}</td>
             <td>{{ empleado.nombre_usuario }}</td>
-            <td class="password-cell">
-              <span>{{ empleado.showPassword ? empleado.contraseña : '*'.repeat(8) }}</span>
-              <i 
-                :class="empleado.showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"
-                class="toggle-password-table"
-                @click="togglePasswordVisibilityInTable(empleado)"
-              ></i>
-            </td>
             <td>{{ empleado.correo }}</td>
             <td>{{ empleado.telefono }}</td>
             <td>{{ empleado.direccion }}</td>
